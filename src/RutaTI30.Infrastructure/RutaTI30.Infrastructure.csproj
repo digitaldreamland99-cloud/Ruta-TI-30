@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>RutaTI30.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RutaTI30.Domain\RutaTI30.Domain.csproj" />
+    <ProjectReference Include="..\RutaTI30.Application\RutaTI30.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Versión candidata: confirmar disponibilidad con dotnet restore (ver DECISIONS.md D8) -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+  </ItemGroup>
+
+</Project>

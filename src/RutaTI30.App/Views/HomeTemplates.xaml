@@ -1,0 +1,213 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:RutaTI30.App.ViewModels">
+
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+    <DataTemplate DataType="{x:Type vm:HomeViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,20">
+            <StackPanel>
+
+                <!-- Bienvenida (sin datos todavía) -->
+                <Border Style="{StaticResource Card}" Visibility="{Binding IsWelcome, Converter={StaticResource BoolToVis}}"
+                        BorderBrush="{DynamicResource AccentBrush}">
+                    <StackPanel>
+                        <TextBlock Text="Bienvenido a Ruta TI 30" Style="{StaticResource H2}" />
+                        <TextBlock Style="{StaticResource Body}" Margin="0,8,0,0"
+                                   Text="Este programa te acompaña durante 30 días hacia tu primer puesto de soporte TI: aprendizaje guiado, laboratorio simulado, simulador de tickets y preparación de entrevistas. Tus datos se guardan solo en tu equipo; no necesitas Internet." />
+                        <TextBlock Style="{StaticResource Muted}" Margin="0,8,0,0"
+                                   Text="Empieza por «Mi ruta de aprendizaje»: el día 1 está listo. Usa el temporizador para organizar tu sesión y registra tu progreso." />
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                            <Button Content="Comenzar en la ruta" Style="{StaticResource BtnPrimary}" Command="{Binding ContinueCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Tarjeta principal: mi día -->
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding DayHeader}" Style="{StaticResource H2}" Margin="0,0,12,0" />
+                                <Border Style="{StaticResource Badge}" Background="{DynamicResource AccentBrush}">
+                                    <TextBlock Text="{Binding StateBadge}" FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource OnAccentBrush}" />
+                                </Border>
+                            </StackPanel>
+                            <Button Grid.Column="1" Content="Continuar →" Style="{StaticResource BtnPrimary}"
+                                    Command="{Binding ContinueCommand}" />
+                        </Grid>
+                        <TextBlock Text="{Binding DayTitle}" Style="{StaticResource H3}" Margin="0,12,0,4" />
+                        <TextBlock Text="{Binding DayObjective}" Style="{StaticResource Body}" />
+                        <TextBlock Text="{Binding DateInfo}" Style="{StaticResource Muted}" Margin="0,8,0,0" />
+                        <TextBlock Text="{Binding NextActionText}" Style="{StaticResource Body}" FontWeight="SemiBold"
+                                   Margin="0,10,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Estadísticas y pendientes -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Mi progreso" Style="{StaticResource H3}" />
+                            <TextBlock Text="{Binding CountsText}" Style="{StaticResource Body}" Margin="0,10,0,0" />
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Estudio de hoy" Style="{StaticResource Label}" />
+                                    <TextBlock Text="{Binding StudyToday}" Style="{StaticResource H3}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Acumulado" Style="{StaticResource Label}" />
+                                    <TextBlock Text="{Binding StudyTotal}" Style="{StaticResource H3}" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="{Binding WeeklySummary}" Style="{StaticResource Muted}" Margin="0,12,0,0" />
+                            <TextBlock Text="{Binding LastAttemptText}" Style="{StaticResource Muted}" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Grid.Column="2">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Actividades pendientes" Style="{StaticResource H3}" />
+                                <ItemsControl ItemsSource="{Binding PendingActivities}" Margin="0,10,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Style="{StaticResource Body}" Text="{Binding}"
+                                                       Margin="0,0,0,6" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Temas recomendados para repaso" Style="{StaticResource H3}" />
+                                <ItemsControl ItemsSource="{Binding ReviewTopics}" Margin="0,10,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="6"
+                                                    Padding="10,6" Margin="0,0,0,6">
+                                                <TextBlock Style="{StaticResource Body}" Text="{Binding}" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Horario y temporizador -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Horario de hoy" Style="{StaticResource H3}" />
+                            <TextBlock Text="Propuesta editable (Configuración). Puedes estudiar cuando quieras."
+                                       Style="{StaticResource Muted}" Margin="0,4,0,8" />
+                            <ItemsControl ItemsSource="{Binding Schedule}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="6" Padding="10,7" Margin="0,0,0,4">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsNow}" Value="True">
+                                                            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="90" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding TimeRange}" FontWeight="SemiBold" FontSize="13">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock" BasedOn="{StaticResource Body}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsNow}" Value="True">
+                                                                    <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="1" Text="{Binding Label}" FontSize="13">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock" BasedOn="{StaticResource Body}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsNow}" Value="True">
+                                                                    <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+                                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Temporizador de estudio" Style="{StaticResource H3}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                                <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="10" Padding="18,12">
+                                    <TextBlock Text="{Binding TimerRemaining}" FontSize="34" FontWeight="Bold"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                </Border>
+                                <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding TimerStatusText}" Style="{StaticResource H3}" />
+                                    <TextBlock Text="{Binding TimerBlock}" Style="{StaticResource Muted}" />
+                                    <TextBlock Style="{StaticResource Muted}">
+                                        <Run Text="Transcurrido: " /><Run Text="{Binding TimerElapsed, Mode=OneWay}" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock Text="{Binding RecoveryNote}" Style="{StaticResource Muted}"
+                                       Foreground="{DynamicResource WarningBrush}" Margin="0,10,0,0" />
+                            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                                <Button Content="Iniciar" Style="{StaticResource BtnPrimary}" Command="{Binding StartCommand}" />
+                                <Button Content="Pausar" Style="{StaticResource BtnSecondary}" Command="{Binding PauseCommand}" />
+                                <Button Content="Reanudar" Style="{StaticResource BtnSecondary}" Command="{Binding ResumeCommand}" />
+                                <Button Content="Finalizar" Style="{StaticResource BtnSecondary}" Command="{Binding FinishCommand}" />
+                                <Button Content="Reiniciar" Style="{StaticResource BtnDanger}" Command="{Binding ResetCommand}" />
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource Muted}" Margin="0,12,0,0"
+                                       Text="El tiempo solo cuenta cuando la sesión está activa; las pausas y el tiempo con la aplicación cerrada no se acumulan." />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+</ResourceDictionary>

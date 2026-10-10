@@ -1,0 +1,685 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:RutaTI30.App.ViewModels">
+
+    <!-- ===================== SIMULADOR DE TICKETS ===================== -->
+    <DataTemplate DataType="{x:Type vm:TicketsViewModel}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Lista y filtros -->
+            <Border Grid.Column="0" Style="{StaticResource Card}" Padding="10">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top">
+                        <TextBlock Text="Tickets (datos ficticios)" Style="{StaticResource H3}" Margin="8,6,8,8" />
+                        <ComboBox ItemsSource="{Binding StateFilters}" SelectedItem="{Binding SelectedStateFilter}"
+                                  DisplayMemberPath="Label" Margin="0,0,0,8" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Style="{StaticResource Field}" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0" />
+                            <Button Grid.Column="1" Content="Buscar" Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding SearchCommand}" Margin="0,0,0,8" />
+                        </Grid>
+                        <Button Content="Nuevo ticket" Style="{StaticResource BtnPrimary}"
+                                Command="{Binding NewTicketCommand}" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <ListBox Style="{StaticResource PlainList}" ItemsSource="{Binding Tickets}"
+                             SelectedItem="{Binding SelectedTicket}" Margin="0,10,0,0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="2,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Id}" FontWeight="SemiBold" FontSize="12"
+                                                   Foreground="{DynamicResource AccentBrush}" />
+                                        <TextBlock Text="{Binding PriorityLabel}" FontSize="11" Margin="8,0,0,0" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Reporter}" Style="{StaticResource Body}" FontSize="13" />
+                                    <TextBlock Text="{Binding Preview}" Style="{StaticResource Muted}" FontSize="11" />
+                                    <TextBlock Text="{Binding StateLabel}" FontSize="11" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <!-- Editor -->
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" Padding="0,0,8,20">
+                <StackPanel>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <Grid>
+                                <TextBlock Text="{Binding EditId}" Style="{StaticResource H2}" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Border Style="{StaticResource Badge}" Background="{DynamicResource SurfaceAltBrush}">
+                                        <TextBlock Text="{Binding StateText}" FontSize="12" FontWeight="SemiBold" />
+                                    </Border>
+                                    <Border Style="{StaticResource Badge}" Background="{DynamicResource AccentBrush}">
+                                        <TextBlock Text="{Binding PriorityText}" FontSize="12" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource OnAccentBrush}" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource Muted}" Margin="0,8,0,10"
+                                       Foreground="{DynamicResource WarningBrush}" />
+
+                            <!-- Casos de práctica: cargan el formulario; la guía queda al final del formulario -->
+                            <Border Style="{StaticResource Card}" Padding="10" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox ItemsSource="{Binding PracticeCases}"
+                                              SelectedItem="{Binding SelectedPracticeCase}"
+                                              DisplayMemberPath="Title"
+                                              VerticalAlignment="Center"
+                                              ToolTip="Casos de práctica con datos ficticios: carga uno, investiga y documenta como en un ticket real." />
+                                    <Button Grid.Column="2" Content="Cargar caso"
+                                            Command="{Binding LoadPracticeCaseCommand}" />
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Text="Usuario afectado (ficticio) *" Style="{StaticResource Label}" />
+                            <TextBox Style="{StaticResource Field}" Text="{Binding Reporter, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Departamento" Style="{StaticResource Label}" />
+                            <TextBox Style="{StaticResource Field}" Text="{Binding Department, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Descripción *" Style="{StaticResource Label}" />
+                            <TextBox Style="{StaticResource FieldArea}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Categoría" Style="{StaticResource Label}" />
+                                    <ComboBox ItemsSource="{Binding CategoryOptions}" SelectedItem="{Binding Category}"
+                                              DisplayMemberPath="Label" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Impacto" Style="{StaticResource Label}" />
+                                    <ComboBox ItemsSource="{Binding ImpactOptions}" SelectedItem="{Binding Impact}"
+                                              DisplayMemberPath="Label" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="Urgencia" Style="{StaticResource Label}" />
+                                    <ComboBox ItemsSource="{Binding UrgencyOptions}" SelectedItem="{Binding Urgency}"
+                                              DisplayMemberPath="Label" />
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="Objetivo de atención (horas, ejemplo didáctico)" Style="{StaticResource Label}" />
+                            <TextBox Style="{StaticResource Field}" Text="{Binding TargetHours, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <!-- Guía del caso de práctica: se muestra tras cargar un caso -->
+                            <Border Style="{StaticResource Card}" Padding="10" Margin="0,10,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Guía del caso de práctica" Style="{StaticResource H3}" Margin="0,0,0,6" />
+                                    <TextBlock Text="Carga un caso de práctica para ver aquí las preguntas de diagnóstico, los pasos sugeridos y los criterios de solución o escalamiento. Intenta resolver el caso antes de consultar la guía."
+                                               Style="{StaticResource Muted}" TextWrapping="Wrap" />
+                                    <ItemsControl ItemsSource="{Binding PracticeGuide}" Margin="0,6,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" Style="{StaticResource Body}"
+                                                           TextWrapping="Wrap" Margin="0,2" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Guardar" Style="{StaticResource BtnPrimary}" Command="{Binding SaveCommand}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Gestión del ticket" Style="{StaticResource H3}" />
+                                <TextBlock Text="Cambio de estado (solo transiciones válidas)" Style="{StaticResource Label}"
+                                           Margin="0,10,0,4" />
+                                <ComboBox ItemsSource="{Binding NextStateOptions}" SelectedItem="{Binding SelectedNextState}"
+                                          DisplayMemberPath="Label" />
+                                <TextBlock Text="Resolución (obligatoria para resolver)" Style="{StaticResource Label}" />
+                                <TextBox Style="{StaticResource FieldArea}" Text="{Binding Resolution, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="Nota técnica para el historial" Style="{StaticResource Label}" />
+                                <TextBox Style="{StaticResource Field}" Text="{Binding NoteText, UpdateSourceTrigger=PropertyChanged}" />
+                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                    <Button Content="Aplicar estado" Style="{StaticResource BtnPrimary}"
+                                            Command="{Binding ChangeStateCommand}" />
+                                    <Button Content="Añadir nota" Style="{StaticResource BtnSecondary}"
+                                            Command="{Binding AddNoteCommand}" />
+                                    <Button Content="Escalar" Style="{StaticResource BtnSecondary}"
+                                            Command="{Binding EscalateCommand}" />
+                                    <Button Content="Resolver" Style="{StaticResource BtnSecondary}"
+                                            Command="{Binding ResolveCommand}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2" Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Historial" Style="{StaticResource H3}" />
+                                <ItemsControl ItemsSource="{Binding History}" Margin="0,10,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="6"
+                                                    Padding="10,8" Margin="0,0,0,6">
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding WhenLocal}" FontSize="11"
+                                                                   Foreground="{DynamicResource MutedBrush}" />
+                                                        <TextBlock Text="{Binding Action}" FontSize="12" FontWeight="SemiBold"
+                                                                   Margin="8,0,0,0" />
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Transition}" FontSize="12"
+                                                               Foreground="{DynamicResource AccentBrush}" />
+                                                    <TextBlock Text="{Binding Note}" Style="{StaticResource Muted}" FontSize="12" />
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Style="{StaticResource Muted}" Margin="0,6,0,0"
+                                           Text="Los SLA y prioridades de este simulador son ejemplos didácticos configurables; cada organización define los suyos." />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DataTemplate>
+
+    <!-- ===================== PREPARACIÓN LABORAL ===================== -->
+    <DataTemplate DataType="{x:Type vm:CareerViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,20">
+            <StackPanel>
+                <!-- Entrevistas -->
+                <Border Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="320" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel>
+                            <TextBlock Text="Banco de preguntas" Style="{StaticResource H3}" />
+                            <ListBox Style="{StaticResource PlainList}" ItemsSource="{Binding Questions}"
+                                     SelectedItem="{Binding SelectedQuestion}" MaxHeight="420" Margin="0,10,0,0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="2,4">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding KindLabel}" FontSize="11" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource AccentBrush}" />
+                                                <TextBlock Text="{Binding Area}" FontSize="11" Margin="8,0,0,0"
+                                                           Foreground="{DynamicResource MutedBrush}" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Statement}" Style="{StaticResource Body}" FontSize="13" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+
+                        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" MaxHeight="520">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Statement}" Style="{StaticResource H3}" TextWrapping="Wrap" />
+                                <TextBlock Text="Respuesta orientativa (no garantiza contratación)" Style="{StaticResource Label}"
+                                           Margin="0,12,0,4" />
+                                <TextBlock Text="{Binding ModelAnswer}" Style="{StaticResource Body}" />
+                                <TextBlock Text="Por qué es buena" Style="{StaticResource Label}" Margin="0,12,0,4" />
+                                <TextBlock Text="{Binding Explanation}" Style="{StaticResource Body}" />
+
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Conceptos clave" Style="{StaticResource Label}" />
+                                        <ItemsControl ItemsSource="{Binding KeyConcepts}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" Style="{StaticResource Muted}" FontSize="12" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Errores frecuentes" Style="{StaticResource Label}" />
+                                        <ItemsControl ItemsSource="{Binding CommonMistakes}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" Style="{StaticResource Muted}" FontSize="12"
+                                                               Foreground="{DynamicResource DangerBrush}" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="Tu respuesta" Style="{StaticResource Label}" Margin="0,14,0,4" />
+                                <TextBox Style="{StaticResource FieldArea}" Text="{Binding AnswerText, UpdateSourceTrigger=PropertyChanged}" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Autoevaluación (1–5)" Style="{StaticResource Label}" />
+                                        <ComboBox ItemsSource="{Binding RatingOptions}" SelectedItem="{Binding SelfRating}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Notas personales" Style="{StaticResource Label}" />
+                                        <TextBox Style="{StaticResource Field}" Text="{Binding NotesText, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Guardar mi respuesta" Style="{StaticResource BtnPrimary}"
+                                            Command="{Binding SaveAnswerCommand}" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource Muted}" Margin="0,8,0,0" />
+
+                                <TextBlock Text="Historial de respuestas" Style="{StaticResource H3}" Margin="0,14,0,6" />
+                                <ItemsControl ItemsSource="{Binding AnswerHistory}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Style="{StaticResource Muted}" Margin="0,0,0,4">
+                                                <Run Text="{Binding WhenLocal, Mode=OneWay}" />
+                                                <Run Text=" · " /><Run Text="{Binding Rating, Mode=OneWay}" />
+                                                <Run Text=" · " /><Run Text="{Binding AnswerPreview, Mode=OneWay}" />
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <TextBlock Text="Tu guía de fortalezas y repaso (calculada de tus autoevaluaciones)"
+                                           Style="{StaticResource H3}" Margin="0,14,0,6" />
+                                <ItemsControl ItemsSource="{Binding InterviewGuide}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Style="{StaticResource Body}"
+                                                       TextWrapping="Wrap" Margin="0,0,0,4" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- Postulaciones -->
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="Registro de postulaciones (local)" Style="{StaticResource H2}" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <ComboBox ItemsSource="{Binding StateOptions}" SelectedItem="{Binding SelectedStateFilter}"
+                                          DisplayMemberPath="Label" Margin="0,0,10,0" />
+                                <Button Content="Nueva" Style="{StaticResource BtnSecondary}" Command="{Binding NewApplicationCommand}" />
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Text="Esta aplicación solo guarda registros en tu equipo; nunca envía postulaciones a empleadores."
+                                   Style="{StaticResource Muted}" Margin="0,6,0,10" />
+
+                        <ListBox ItemsSource="{Binding Applications}" SelectedItem="{Binding SelectedApplication}"
+                                 Style="{StaticResource PlainList}" MaxHeight="200">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="2,4">
+                                        <TextBlock Text="{Binding Company}" FontWeight="SemiBold" FontSize="13" />
+                                        <TextBlock Text="{Binding Role}" Style="{StaticResource Muted}" FontSize="13" Margin="8,0,0,0" />
+                                        <TextBlock Text="{Binding StateLabel}" FontSize="12"
+                                                   Foreground="{DynamicResource AccentBrush}" Margin="16,0,0,0" />
+                                        <TextBlock Text="{Binding NextFollowUp, StringFormat='Seguimiento: {0}'}"
+                                                   Style="{StaticResource Muted}" FontSize="12" Margin="16,0,0,0" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <TextBlock Text="{Binding JobStatusMessage}" Style="{StaticResource Muted}" Margin="0,8,0,0"
+                                   Foreground="{DynamicResource WarningBrush}" />
+
+                        <Grid Margin="0,6,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Empresa *" Style="{StaticResource Label}" />
+                                <TextBox Style="{StaticResource Field}" Text="{Binding Company, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Puesto *" Style="{StaticResource Label}" />
+                                <TextBox Style="{StaticResource Field}" Text="{Binding Role, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Ubicación" Style="{StaticResource Label}" />
+                                <TextBox Style="{StaticResource Field}" Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Fecha de descubrimiento" Style="{StaticResource Label}" />
+                                <DatePicker SelectedDate="{Binding Discovered}" Margin="0,0,0,10" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Fecha de postulación" Style="{StaticResource Label}" />
+                                <DatePicker SelectedDate="{Binding Applied}" Margin="0,0,0,10" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Enlace de la vacante" Style="{StaticResource Label}" />
+                                <TextBox Style="{StaticResource Field}" Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Salario publicado" Style="{StaticResource Label}" />
+                                <TextBox Style="{StaticResource Field}" Text="{Binding Salary, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Estado" Style="{StaticResource Label}" />
+                                <ComboBox ItemsSource="{Binding StateOptions}" SelectedItem="{Binding JobStateSelected}"
+                                          DisplayMemberPath="Label" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Contacto / reclutador" Style="{StaticResource Label}" />
+                                <TextBox Style="{StaticResource Field}" Text="{Binding Contact, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Fecha de entrevista" Style="{StaticResource Label}" />
+                                <DatePicker SelectedDate="{Binding Interview}" Margin="0,0,0,10" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Próximo seguimiento" Style="{StaticResource Label}" />
+                                <DatePicker SelectedDate="{Binding NextFollowUp}" Margin="0,0,0,10" />
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Text="Notas" Style="{StaticResource Label}" />
+                        <TextBox Style="{StaticResource FieldArea}" Text="{Binding JobNotes, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Text="Resultado" Style="{StaticResource Label}" />
+                        <TextBox Style="{StaticResource Field}" Text="{Binding Result, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Guardar postulación" Style="{StaticResource BtnPrimary}"
+                                    Command="{Binding SaveApplicationCommand}" />
+                            <Button Content="Eliminar" Style="{StaticResource BtnSecondary}" Margin="10,0,0,0"
+                                    Command="{Binding DeleteApplicationCommand}"
+                                    ToolTip="Elimina la postulación seleccionada y sus seguimientos (pide confirmación)." />
+                        </StackPanel>
+
+                        <Grid Margin="0,12,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Añadir seguimiento" Style="{StaticResource H3}" />
+                                <TextBox Style="{StaticResource Field}" Margin="0,8,0,8"
+                                         Text="{Binding FollowUpNote, UpdateSourceTrigger=PropertyChanged}" />
+                                <Button Content="Registrar seguimiento" Style="{StaticResource BtnSecondary}"
+                                        Command="{Binding AddFollowUpCommand}" HorizontalAlignment="Left" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Historial de seguimientos" Style="{StaticResource H3}" />
+                                <ItemsControl ItemsSource="{Binding FollowUpHistory}" Margin="0,8,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Style="{StaticResource Muted}" Margin="0,0,0,4" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <!-- ===================== MI PROGRESO ===================== -->
+    <DataTemplate DataType="{x:Type vm:ProgressViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,20">
+            <StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Mi progreso" Style="{StaticResource H2}" />
+                        <TextBlock Style="{StaticResource Muted}" Margin="0,6,0,0"
+                                   Text="Todas las cifras se calculan desde tus datos locales; no hay valores simulados."
+                                   Visibility="{Binding NoDataMessage, Converter={StaticResource BoolToVis}}" />
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Lecciones" Style="{StaticResource Label}" />
+                                <TextBlock Text="{Binding LessonsText}" Style="{StaticResource Body}" />
+                                <TextBlock Text="Evaluaciones" Style="{StaticResource Label}" Margin="0,12,0,0" />
+                                <TextBlock Text="{Binding EvaluationsText}" Style="{StaticResource Body}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Tiempo de estudio" Style="{StaticResource Label}" />
+                                <TextBlock Text="{Binding StudyText}" Style="{StaticResource Body}" />
+                                <TextBlock Text="Tickets" Style="{StaticResource Label}" Margin="0,12,0,0" />
+                                <TextBlock Text="{Binding TicketsText}" Style="{StaticResource Body}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Temas que necesitan repaso" Style="{StaticResource H3}" />
+                            <ItemsControl ItemsSource="{Binding WeakTopics}" Margin="0,10,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource Body}"
+                                                   Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,6" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Competencias demostradas" Style="{StaticResource H3}" />
+                            <ItemsControl ItemsSource="{Binding DemonstratedTopics}" Margin="0,10,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource Body}"
+                                                   Foreground="{DynamicResource SuccessBrush}" Margin="0,0,0,6" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Historial de evaluaciones" Style="{StaticResource H3}" />
+                        <ItemsControl ItemsSource="{Binding RecentAttempts}" Margin="0,10,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                        <TextBlock Text="{Binding WhenLocal}" Style="{StaticResource Muted}" FontSize="12" />
+                                        <TextBlock Text="{Binding Lesson}" FontSize="12" Margin="10,0,0,0"
+                                                   Foreground="{DynamicResource AccentBrush}" />
+                                        <TextBlock Text="{Binding Score}" FontSize="12" FontWeight="SemiBold" Margin="10,0,0,0" />
+                                        <TextBlock Text="{Binding Result}" FontSize="12" Margin="10,0,0,0" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="Informe de progreso" Style="{StaticResource H3}" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Generar" Style="{StaticResource BtnSecondary}" Command="{Binding GenerateReportCommand}" />
+                                <Button Content="Exportar…" Style="{StaticResource BtnPrimary}" Command="{Binding ExportReportCommand}" Margin="0" />
+                            </StackPanel>
+                        </Grid>
+                        <TextBox Style="{StaticResource FieldArea}" MinHeight="180" Margin="0,10,0,0"
+                                 Text="{Binding ReportText, Mode=OneWay}" IsReadOnly="True" FontFamily="Consolas" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <!-- ===================== CONFIGURACIÓN ===================== -->
+    <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,20">
+            <StackPanel>
+                <TextBlock Text="{Binding SettingsMessage}" Style="{StaticResource Muted}" Margin="0,0,0,10"
+                           Foreground="{DynamicResource AccentBrush}" />
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Apariencia y preferencias" Style="{StaticResource H3}" />
+                            <TextBlock Text="Tema" Style="{StaticResource Label}" Margin="0,12,0,4" />
+                            <ComboBox ItemsSource="{Binding ThemeOptions}" SelectedItem="{Binding SelectedTheme}" />
+                            <TextBlock Text="Duración de sesión por defecto (minutos)" Style="{StaticResource Label}" />
+                            <TextBox Style="{StaticResource Field}" Text="{Binding SessionMinutes, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Umbral de aprobación (%)" Style="{StaticResource Label}" />
+                            <TextBox Style="{StaticResource Field}" Text="{Binding Threshold, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Día actual del programa (1–30)" Style="{StaticResource Label}" />
+                            <TextBox Style="{StaticResource Field}" Text="{Binding CurrentDay, UpdateSourceTrigger=PropertyChanged}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <Button Content="Guardar preferencias" Style="{StaticResource BtnPrimary}"
+                                        Command="{Binding SavePreferencesCommand}" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding VersionText}" Style="{StaticResource Muted}" Margin="0,16,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Datos y copias de seguridad" Style="{StaticResource H3}" />
+                            <TextBlock Text="Ubicación de tus datos" Style="{StaticResource Label}" Margin="0,12,0,4" />
+                            <TextBlock Text="{Binding DataPath}" Style="{StaticResource Muted}" TextWrapping="Wrap" />
+                            <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                                <Button Content="Crear copia de seguridad" Style="{StaticResource BtnSecondary}"
+                                        Command="{Binding CreateBackupCommand}" />
+                                <Button Content="Restaurar copia…" Style="{StaticResource BtnDanger}"
+                                        Command="{Binding RestoreBackupCommand}" Margin="0" />
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource Muted}" Margin="0,12,0,0"
+                                       Text="La restauración valida la copia antes de aplicarla y conserva una copia automática del estado actual. Ver BACKUP_RESTORE.md." />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="Horario de estudio" Style="{StaticResource H3}" />
+                            <Button Content="Añadir bloque" Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding AddBlockCommand}" HorizontalAlignment="Right" Margin="0,0,0,0" />
+                        </Grid>
+                        <TextBlock Style="{StaticResource Muted}" Margin="0,6,0,8"
+                                   Text="Propuesta inicial editable. Usa el formato HH:mm. El horario nunca bloquea el acceso al contenido." />
+                        <ItemsControl ItemsSource="{Binding Blocks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="6"
+                                            Padding="10,6" Margin="0,0,0,6">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="12" />
+                                                <ColumnDefinition Width="80" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox Style="{StaticResource Field}" Margin="0"
+                                                     Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBox Grid.Column="1" Style="{StaticResource Field}" Margin="0"
+                                                     Text="{Binding Start, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBox Grid.Column="3" Style="{StaticResource Field}" Margin="0"
+                                                     Text="{Binding End, UpdateSourceTrigger=PropertyChanged}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Content="Guardar horario" Style="{StaticResource BtnPrimary}"
+                                    Command="{Binding SaveScheduleCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+</ResourceDictionary>

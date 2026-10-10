@@ -1,0 +1,17 @@
+<Application x:Class="RutaTI30.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Orden importante: el tema (índice 0) lo reemplaza ThemeService -->
+                <ResourceDictionary Source="Themes/Dark.xaml" />
+                <ResourceDictionary Source="Themes/Styles.xaml" />
+                <ResourceDictionary Source="Views/HomeTemplates.xaml" />
+                <ResourceDictionary Source="Views/ModuleTemplates.xaml" />
+                <ResourceDictionary Source="Views/WorkTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
