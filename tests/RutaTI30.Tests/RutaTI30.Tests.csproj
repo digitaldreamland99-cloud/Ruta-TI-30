@@ -1,7 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <!-- net10.0-windows: necesario para referenciar la app WPF (RutaTI30.App) desde las pruebas.
+         En Windows build normal no requiere nada extra; en Linux/CI debe establecer
+         EnableWindowsTargeting=true (compilación cruzada). -->
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
     <RootNamespace>RutaTI30.Tests</RootNamespace>
   </PropertyGroup>
@@ -10,6 +14,7 @@
     <ProjectReference Include="..\..\src\RutaTI30.Domain\RutaTI30.Domain.csproj" />
     <ProjectReference Include="..\..\src\RutaTI30.Application\RutaTI30.Application.csproj" />
     <ProjectReference Include="..\..\src\RutaTI30.Infrastructure\RutaTI30.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\RutaTI30.App\RutaTI30.App.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +25,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
   </ItemGroup>
 
 </Project>

@@ -53,7 +53,7 @@ Motivo: exigido por el enunciado; evita perder el ritmo si el usuario deja de es
 | Microsoft.Data.Sqlite | 10.0.0 | Persistencia |
 | Microsoft.Extensions.DependencyInjection | 10.0.0 | Composición |
 | Microsoft.Extensions.Logging | 10.0.0 | Registro técnico a archivo |
-| xunit / xunit.runner.visualstudio / Microsoft.NET.Test.Sdk | 2.9.3 / 3.x / 17.14.x | Pruebas |
+| xunit / xunit.runner.visualstudio / Microsoft.NET.Test.Sdk | 2.9.3 / 2.8.2 / 17.14.1 | Pruebas (versiones fijadas en `tests/RutaTI30.Tests/RutaTI30.Tests.csproj`) |
 
 Motivo de la cautela: sin `dotnet restore` no es posible verificar disponibilidad exacta. Si el restore falla, ajustar versiones a las disponibles en la fuente configurada y documentar el cambio aquí.
 

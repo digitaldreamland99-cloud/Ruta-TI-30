@@ -50,8 +50,11 @@ public partial class App : Application
             services.AddSingleton<TicketStore>();
             services.AddSingleton<JobStore>();
             services.AddSingleton<LabStore>();
+            services.AddSingleton<DbChangedNotifier>();
+            services.AddSingleton<IDbStateChanged>(sp => sp.GetRequiredService<DbChangedNotifier>());
             services.AddSingleton<BackupService>(sp =>
-                new BackupService(sp.GetRequiredService<AppDb>(), paths.BackupDirectory));
+                new BackupService(sp.GetRequiredService<AppDb>(), paths.BackupDirectory,
+                    sp.GetRequiredService<IDbStateChanged>()));
 
             services.AddSingleton<ILearningStore>(sp => sp.GetRequiredService<LearningStore>());
             services.AddSingleton<ISessionStore>(sp => sp.GetRequiredService<SessionStore>());
@@ -63,10 +66,12 @@ public partial class App : Application
             services.AddSingleton<ILessonCatalog>(LessonCatalog.Instance);
             services.AddSingleton<ILabCatalog>(LabCatalog.Instance);
             services.AddSingleton<IInterviewBank>(InterviewBank.Instance);
+            services.AddSingleton<IGlossaryCatalog>(sp => GlossaryCatalog.Instance);
 
             services.AddSingleton<EvaluationService>(sp =>
                 new EvaluationService(GetThreshold(sp.GetRequiredService<IPreferenceStore>())));
             services.AddSingleton<ProgressService>();
+            services.AddSingleton<ReviewService>();
             services.AddSingleton<ScheduleService>();
             services.AddSingleton<StudyTimerService>();
             services.AddSingleton<DashboardService>();
@@ -80,6 +85,8 @@ public partial class App : Application
             services.AddSingleton<TicketsViewModel>();
             services.AddSingleton<CareerViewModel>();
             services.AddSingleton<ProgressViewModel>();
+            services.AddSingleton<GlossaryViewModel>();
+            services.AddSingleton<RoutesViewModel>();
             services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<MainWindow>();

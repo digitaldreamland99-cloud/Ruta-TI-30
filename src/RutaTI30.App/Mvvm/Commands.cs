@@ -43,6 +43,25 @@ public sealed class AsyncRelayCommand : ICommand
     public event EventHandler? CanExecuteChanged;
     public bool CanExecute(object? parameter) => !_isRunning && (_canExecute?.Invoke() ?? true);
 
+    /// <summary>Ejecución sincrónica-esperable para pruebas (no usable desde XAML por diseño).</summary>
+    public Task ExecuteTask(object? parameter)
+    {
+        if (!CanExecute(parameter)) return Task.CompletedTask;
+        _isRunning = true;
+        RaiseCanExecuteChanged();
+        try
+        {
+            return _executeWithParameter is not null
+                ? _executeWithParameter(parameter)
+                : _execute();
+        }
+        finally
+        {
+            _isRunning = false;
+            RaiseCanExecuteChanged();
+        }
+    }
+
     public async void Execute(object? parameter)
     {
         if (!CanExecute(parameter)) return;

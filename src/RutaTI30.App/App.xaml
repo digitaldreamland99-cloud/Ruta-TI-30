@@ -11,6 +11,8 @@
                 <ResourceDictionary Source="Views/HomeTemplates.xaml" />
                 <ResourceDictionary Source="Views/ModuleTemplates.xaml" />
                 <ResourceDictionary Source="Views/WorkTemplates.xaml" />
+                <ResourceDictionary Source="Views/GlossaryTemplates.xaml" />
+                <ResourceDictionary Source="Views/RoutesTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

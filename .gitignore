@@ -12,6 +12,10 @@ TestResults/
 *.db-wal
 *.db-shm
 
+# Salidas de verificación locales (nunca se versionan)
+reports/
+__pycache__/
+
 # Sistema
 .DS_Store
 Thumbs.db

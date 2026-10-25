@@ -1,4 +1,5 @@
 using RutaTI30.App.Mvvm;
+using RutaTI30.Application.Abstractions;
 
 namespace RutaTI30.App.ViewModels;
 
@@ -11,7 +12,7 @@ public interface INavigableModule
     Task RefreshAsync();
 }
 
-/// <summary>VM principal: navega entre los siete módulos y actualiza el encabezado.</summary>
+/// <summary>VM principal: navega entre los nueve módulos y actualiza el encabezado.</summary>
 public sealed class MainViewModel : ObservableObject
 {
     private readonly HomeViewModel _home;
@@ -20,7 +21,10 @@ public sealed class MainViewModel : ObservableObject
     private readonly TicketsViewModel _tickets;
     private readonly CareerViewModel _career;
     private readonly ProgressViewModel _progress;
+    private readonly GlossaryViewModel _glossary;
+    private readonly RoutesViewModel _routes;
     private readonly SettingsViewModel _settings;
+    private readonly IDbStateChanged _dbChanged;
 
     private NavItem? _selectedNav;
     private object? _currentViewModel;
@@ -35,12 +39,15 @@ public sealed class MainViewModel : ObservableObject
         new("tickets", "Simulador de Help Desk"),
         new("career", "Preparación laboral"),
         new("progress", "Mi progreso"),
+        new("glossary", "Glosario"),
+        new("routes", "Rutas"),
         new("settings", "Configuración")
     };
 
     public MainViewModel(HomeViewModel home, LearnViewModel learn, LabViewModel lab,
         TicketsViewModel tickets, CareerViewModel career, ProgressViewModel progress,
-        SettingsViewModel settings)
+        GlossaryViewModel glossary, RoutesViewModel routes, SettingsViewModel settings,
+        IDbStateChanged dbChanged)
     {
         _home = home;
         _learn = learn;
@@ -48,8 +55,14 @@ public sealed class MainViewModel : ObservableObject
         _tickets = tickets;
         _career = career;
         _progress = progress;
+        _glossary = glossary;
+        _routes = routes;
         _settings = settings;
+        _dbChanged = dbChanged;
 
+        // Cuando la base de datos cambia (p. ej. restauración de una copia), refrescar todos los
+        // módulos con estado cargado para que ningún panel siga mostrando datos de la base anterior.
+        _dbChanged.DataChanged += OnDatabaseChanged;
         // Enlaces rápidos desde Inicio hacia otros módulos.
         _home.Navigate = key => SelectedNav = NavItems.FirstOrDefault(n => n.Key == key) ?? NavItems[0];
 
@@ -74,6 +87,8 @@ public sealed class MainViewModel : ObservableObject
                 "tickets" => _tickets,
                 "career" => _career,
                 "progress" => _progress,
+                "glossary" => _glossary,
+                "routes" => _routes,
                 "settings" => _settings,
                 _ => _home
             };
@@ -102,6 +117,19 @@ public sealed class MainViewModel : ObservableObject
 
     /// <summary>Carga inicial (llamada al arrancar la aplicación).</summary>
     public Task InitializeAsync() => RefreshCurrentAsync();
+
+    private void OnDatabaseChanged()
+    {
+        _ = RefreshCurrentAsync();
+        _ = _home.RefreshAsync();
+        _ = _progress.RefreshAsync();
+        _ = _learn.RefreshAsync();
+        _ = _lab.RefreshAsync();
+        _ = _tickets.RefreshAsync();
+        _ = _career.RefreshAsync();
+        _ = _settings.RefreshAsync();
+        // El glosario y las rutas provienen de catálogos en memoria, no de la base: no requieren refresco.
+    }
 
     private async Task RefreshCurrentAsync()
     {

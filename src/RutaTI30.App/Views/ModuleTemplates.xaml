@@ -57,10 +57,26 @@
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{Binding LessonTitle}" Style="{StaticResource H2}" />
-                                    <Border Style="{StaticResource Badge}" Background="{DynamicResource AccentBrush}"
-                                            VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding LessonStateText}" FontSize="12" FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource OnAccentBrush}" />
+                                    <!-- Estado con color semántico + texto nominal (idéntico al patrón del dashboard) -->
+                                    <Border Style="{StaticResource Badge}" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding LessonStateText}" FontSize="12" FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource BadgeText}">
+                                                    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding LessonStateText}" Value="En curso">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding LessonStateText}" Value="Completado">
+                                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding LessonStateText}" Value="Dominado">
+                                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </Border>
                                 </StackPanel>
                                 <TextBlock Text="{Binding LessonMeta}" Style="{StaticResource Muted}" Margin="0,6,0,0" />
@@ -78,8 +94,7 @@
                         </Border>
 
                         <!-- Evaluación -->
-                        <Border Style="{StaticResource Card}" Visibility="{Binding EvaluationVisible, Converter={StaticResource BoolToVis}}"
-                                BorderBrush="{DynamicResource AccentBrush}">
+                        <Border Style="{StaticResource MsgInfo}" Visibility="{Binding EvaluationVisible, Converter={StaticResource BoolToVis}}">
                             <StackPanel>
                                 <TextBlock Text="Evaluación de la lección" Style="{StaticResource H3}" />
                                 <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,10"
@@ -95,6 +110,31 @@
                                                     <ListBox ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}"
                                                              Background="Transparent" BorderThickness="0" Margin="0,8,0,0"
                                                              Padding="0">
+                                                        <ListBox.ItemContainerStyle>
+                                                            <Style TargetType="ListBoxItem">
+                                                                <Setter Property="Template">
+                                                                    <Setter.Value>
+                                                                        <ControlTemplate TargetType="ListBoxItem">
+                                                                            <Border x:Name="bd" Background="Transparent"
+                                                                                    BorderBrush="{DynamicResource BorderBrush2}"
+                                                                                    BorderThickness="1"
+                                                                                    CornerRadius="6" Padding="10,7" Margin="0,0,0,6">
+                                                                                <ContentPresenter />
+                                                                            </Border>
+                                                                            <ControlTemplate.Triggers>
+                                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                                    <Setter TargetName="bd" Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+                                                                                </Trigger>
+                                                                                <Trigger Property="IsSelected" Value="True">
+                                                                                    <Setter TargetName="bd" Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+                                                                                    <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                                                </Trigger>
+                                                                            </ControlTemplate.Triggers>
+                                                                        </ControlTemplate>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                        </ListBox.ItemContainerStyle>
                                                         <ListBox.ItemTemplate>
                                                             <DataTemplate>
                                                                 <TextBlock Text="{Binding Text}" Style="{StaticResource Body}"
@@ -122,7 +162,8 @@
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <TextBlock Text="Explicación para principiantes" Style="{StaticResource H3}" />
-                                <TextBlock Text="{Binding Explanation}" Style="{StaticResource Body}" Margin="0,8,0,0" />
+                                <TextBlock Text="{Binding Explanation}" Style="{StaticResource Body}" MaxWidth="760"
+                                           HorizontalAlignment="Left" Margin="0,8,0,0" />
                             </StackPanel>
                         </Border>
 
@@ -147,7 +188,8 @@
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <TextBlock Text="Ejemplo en un entorno laboral" Style="{StaticResource H3}" />
-                                <TextBlock Text="{Binding Workplace}" Style="{StaticResource Body}" Margin="0,8,0,0" />
+                                <TextBlock Text="{Binding Workplace}" Style="{StaticResource Body}" MaxWidth="760"
+                                           HorizontalAlignment="Left" Margin="0,8,0,0" />
                             </StackPanel>
                         </Border>
 
@@ -281,7 +323,8 @@
                             <TextBlock Text="{Binding Difficulty}" Style="{StaticResource Muted}" Margin="0,6,0,0"
                                        Foreground="{DynamicResource WarningBrush}" />
                             <TextBlock Text="Contexto" Style="{StaticResource H3}" Margin="0,12,0,4" />
-                            <TextBlock Text="{Binding Context}" Style="{StaticResource Body}" />
+                            <TextBlock Text="{Binding Context}" Style="{StaticResource Body}" MaxWidth="760"
+                                       HorizontalAlignment="Left" />
                             <TextBlock Text="Síntomas" Style="{StaticResource H3}" Margin="0,12,0,4" />
                             <ItemsControl ItemsSource="{Binding Symptoms}">
                                 <ItemsControl.ItemTemplate>
@@ -374,8 +417,7 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource Card}" Visibility="{Binding Finished, Converter={StaticResource BoolToVis}}"
-                                    BorderBrush="{DynamicResource AccentBrush}">
+                            <Border Style="{StaticResource MsgInfo}" Visibility="{Binding Finished, Converter={StaticResource BoolToVis}}">
                                 <StackPanel>
                                     <TextBlock Text="Resultado del caso" Style="{StaticResource H3}" />
                                     <TextBlock Text="{Binding ResultText}" Style="{StaticResource Body}" Margin="0,8,0,0"

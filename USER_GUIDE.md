@@ -10,15 +10,17 @@ Aplicación de escritorio en español para prepararte en 30 días hacia puestos 
 
 ## Navegación
 
-Barra lateral izquierda con las 7 secciones:
+Barra lateral izquierda con las 9 secciones:
 
 1. **Inicio (Mi día)** — día del programa, actividad recomendada, tiempo estudiado hoy y acumulado, actividades pendientes, último resultado, temas de repaso, resumen semanal, horario de hoy (el bloque actual se resalta) y el **temporizador**.
 2. **Mi ruta de aprendizaje** — lista de los 30 días con su estado; al seleccionar uno ves la lección completa: objetivo, explicación, conceptos, ejemplo laboral, procedimiento, errores frecuentes, ejercicios, evaluación con soluciones razonadas, criterios de aprobación, resumen, repaso, referencias e historial de intentos.
 3. **Laboratorio de soporte** — 10 escenarios simulados: lees síntomas y datos, realizas acciones (diagnóstico de solo lectura o cambios simulados), observas las evidencias que produce cada decisión, finalizas el caso y obtienes puntaje con solución, cuándo escalar y criterios.
 4. **Simulador de Help Desk** — crea, edita, filtra y busca tickets; la prioridad se calcula con impacto × urgencia; solo se permiten transiciones de estado válidas; cada acción queda en el historial; notas técnicas, escalamiento y resolución con texto obligatorio.
 5. **Preparación laboral** — banco de preguntas de entrevista con respuesta orientativa, explicación y criterios; escribe y guarda tus respuestas con autoevaluación; registro de postulaciones con estados, entrevistas y seguimientos.
-6. **Mi progreso** — estadísticas de tus datos reales (lecciones, evaluaciones, tiempo, tickets), temas débiles, competencias demostradas, historial de evaluaciones e **informe exportable** (Exportar… a Markdown).
-7. **Configuración** — tema oscuro/claro, duración de sesión, umbral de aprobación, día del programa, horario editable, ubicación de los datos, copia de seguridad y restauración.
+6. **Mi progreso** — estadísticas de tus datos reales (lecciones, evaluaciones, tiempo, tickets), temas débiles, competencias demostradas, **repaso inteligente**, historial de evaluaciones e **informe exportable** (Exportar… a Markdown).
+7. **Glosario** — biblioteca de consulta sin conexión: conceptos de hardware, Windows, redes, Service Desk e IAM con definición sencilla, explicación técnica, ejemplo laboral, error frecuente y enlaces con las lecciones. Busca por palabra y filtra por categoría.
+8. **Rutas** — itinerarios opcionales posteriores al día 30 (Service Desk L1, aplicaciones, redes, Windows y Microsoft 365, IAM) con prerrequisitos, competencias y prácticas asociadas. No son obligatorios para tu primer empleo.
+9. **Configuración** — tema oscuro/claro, duración de sesión, umbral de aprobación, día del programa, horario editable, ubicación de los datos, copia de seguridad y restauración.
 
 ## El temporizador
 
@@ -30,6 +32,10 @@ Barra lateral izquierda con las 7 secciones:
 
 - **No iniciado** → **En curso** (botón «Marcar en curso») → **Completado** («Marcar completada» tras lectura y ejercicios) → **Dominado** (solo con evaluación aprobada ≥ umbral, 80 % por defecto).
 - Completar la lectura nunca otorga el dominio. Puedes repetir evaluaciones: el historial conserva todos los intentos.
+
+## Repaso inteligente
+
+Cuando fallas temas en una evaluación, esos conceptos entran en un calendario de repaso con intervalos crecientes: primero a los 1, 2, 4 y 8 días (máximo 14) y, si aciertas de forma consecutiva, el intervalo se alarga (3, 7, 14 y 30 días). Se muestra en **Mi progreso** y en el informe. El cálculo usa únicamente tus evaluaciones registradas; un concepto nunca fallado no entra en la cola.
 
 ## Día del programa
 

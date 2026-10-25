@@ -20,6 +20,60 @@ public class BackupServiceTests : IDisposable
 
     public void Dispose() => _db.Dispose();
 
+    [Fact]
+    public void Constructor_SinNotificador_ConsienteDependencia()
+    {
+        // Con el wiring por defecto (sin IDbStateChanged) el servicio debe seguir siendo
+        // utilizable: crear copia y validarla no debe fallar por falta de suscriptor.
+        var service = new BackupService(_db.Db, Path.Combine(_db.DirectoryPath, "backups-null"));
+        var path = service.CreateBackup();
+        Assert.True(service.Validate(path).IsValid);
+    }
+
+    [Fact]
+    public void Restore_Exitoso_NotificaCambioDeBaseDeDatos()
+    {
+        // F-05: tras restaurar, los componentes con estado cacheado deben enterarse.
+        // Se comprueba con un notificador real (el mismo mecanismo que usa la App).
+        var notifier = new DbChangeRecorder();
+        var service = new BackupService(_db.Db, Path.Combine(_db.DirectoryPath, "backups-notif"), notifier);
+
+        _store.SaveProgress(new LessonProgress { LessonId = "leccion-01", State = LessonState.InProgress, StartedUtc = DateTime.UtcNow });
+        var backup = service.CreateBackup();
+
+        // Cambiar el estado actual para poder distinguir la base restaurada de la actual.
+        _store.SaveProgress(new LessonProgress { LessonId = "leccion-01", State = LessonState.Mastered, StartedUtc = DateTime.UtcNow });
+
+        var result = service.Restore(backup);
+
+        Assert.True(result.Success, string.Join(", ", result.Errors));
+        Assert.Equal(1, notifier.RaiseCount);
+    }
+
+    [Fact]
+    public void Restore_Fallido_NoNotifica()
+    {   // Un fallo de restauración no debe disparar el evento: la base sigue siendo la anterior.
+        var notifier = new DbChangeRecorder();
+        var service = new BackupService(_db.Db, Path.Combine(_db.DirectoryPath, "backups-notif2"), notifier);
+        var corrupto = Path.Combine(_db.DirectoryPath, "corrupto-notif.db");
+        File.WriteAllText(corrupto, "basura");
+
+        var result = service.Restore(corrupto);
+
+        Assert.False(result.Success);
+        Assert.Equal(0, notifier.RaiseCount);
+    }
+
+    private sealed class DbChangeRecorder : IDbStateChanged
+    {
+        public int RaiseCount;
+
+        public DbChangeRecorder()
+        {
+            DataChanged += () => RaiseCount++;
+        }
+    }
+
     private void GuardarProgreso(string lessonId, LessonState estado) =>
         _store.SaveProgress(new LessonProgress
         {

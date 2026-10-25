@@ -62,9 +62,27 @@
                                     <Border Style="{StaticResource Badge}" Background="{DynamicResource SurfaceAltBrush}">
                                         <TextBlock Text="{Binding StateText}" FontSize="12" FontWeight="SemiBold" />
                                     </Border>
-                                    <Border Style="{StaticResource Badge}" Background="{DynamicResource AccentBrush}">
-                                        <TextBlock Text="{Binding PriorityText}" FontSize="12" FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource OnAccentBrush}" />
+                                    <!-- Prioridad semántica (P1 crítico→peligro, P2→advertencia, P3→acento, P4→neutro);
+                                         el texto nombra el nivel, no depende solo del color -->
+                                    <Border Style="{StaticResource Badge}">
+                                        <TextBlock Text="{Binding PriorityText}" FontSize="12" FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource BadgeText}">
+                                                    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding PriorityText}" Value="P1 · Crítica">
+                                                            <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding PriorityText}" Value="P2 · Alta">
+                                                            <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding PriorityText}" Value="P3 · Media">
+                                                            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </Border>
                                 </StackPanel>
                             </Grid>
@@ -249,9 +267,11 @@
                                 <TextBlock Text="{Binding Statement}" Style="{StaticResource H3}" TextWrapping="Wrap" />
                                 <TextBlock Text="Respuesta orientativa (no garantiza contratación)" Style="{StaticResource Label}"
                                            Margin="0,12,0,4" />
-                                <TextBlock Text="{Binding ModelAnswer}" Style="{StaticResource Body}" />
+                                <TextBlock Text="{Binding ModelAnswer}" Style="{StaticResource Body}" MaxWidth="760"
+                                           HorizontalAlignment="Left" />
                                 <TextBlock Text="Por qué es buena" Style="{StaticResource Label}" Margin="0,12,0,4" />
-                                <TextBlock Text="{Binding Explanation}" Style="{StaticResource Body}" />
+                                <TextBlock Text="{Binding Explanation}" Style="{StaticResource Body}" MaxWidth="760"
+                                           HorizontalAlignment="Left" />
 
                                 <Grid Margin="0,12,0,0">
                                     <Grid.ColumnDefinitions>
@@ -553,6 +573,24 @@
                         </StackPanel>
                     </Border>
                 </Grid>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Repaso inteligente" Style="{StaticResource H3}" />
+                        <TextBlock Text="{Binding ReviewSummaryText}" Style="{StaticResource Muted}"
+                                   Margin="0,6,0,0" TextWrapping="Wrap" />
+                        <ItemsControl ItemsSource="{Binding DueReviews}" Margin="0,10,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Style="{StaticResource Body}"
+                                               TextWrapping="Wrap" Margin="0,0,0,6" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,0" TextWrapping="Wrap"
+                                   Text="Los conceptos que fallas vuelven antes que los dominados: intervalos crecientes de 1, 2, 4 y 8 días (máximo 14) y cada acierto alarga el próximo repaso. El cálculo usa únicamente tus evaluaciones registradas." />
+                    </StackPanel>
+                </Border>
 
                 <Border Style="{StaticResource Card}">
                     <StackPanel>

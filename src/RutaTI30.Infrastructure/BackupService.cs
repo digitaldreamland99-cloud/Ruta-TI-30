@@ -5,6 +5,21 @@ namespace RutaTI30.Infrastructure;
 /// <summary>Resultado de la validación de una copia de seguridad.</summary>
 public sealed record BackupValidation(bool IsValid, int SchemaVersion, IReadOnlyList<string> Errors);
 
+/// <summary>
+/// Implementación nula de IDbStateChanged para pruebas y casos donde no hay notificador:
+/// consentir restauraciones sin suscriptor en lugar de fallar la dependencia.
+/// </summary>
+internal sealed class NullDbStateChanged : IDbStateChanged
+{
+    public static readonly NullDbStateChanged Instance = new();
+
+    public event Action? DataChanged
+    {
+        add { }
+        remove { }
+    }
+}
+
 /// <summary>Resultado de una restauración.</summary>
 public sealed record RestoreResult(bool Success, string? SafetyBackupPath, IReadOnlyList<string> Errors);
 
@@ -17,11 +32,13 @@ public sealed class BackupService
 {
     private readonly AppDb _db;
     private readonly string _backupDirectory;
+    private readonly IDbStateChanged _dbStateChanged;
 
-    public BackupService(AppDb db, string backupDirectory)
+    public BackupService(AppDb db, string backupDirectory, IDbStateChanged dbStateChanged = null)
     {
         _db = db ?? throw new ArgumentNullException(nameof(db));
         _backupDirectory = backupDirectory ?? throw new ArgumentNullException(nameof(backupDirectory));
+        _dbStateChanged = dbStateChanged ?? NullDbStateChanged.Instance;
     }
 
     /// <summary>
@@ -212,6 +229,10 @@ public sealed class BackupService
 
                 // 8. Aplicar o reaplicar migraciones sobre la base restaurada.
                 _db.Initialize();
+
+                // 9. Notificar que la base cambió, para que los componentes con estado cacheado
+                //    (p. ej. ViewModels que ya cargaron listas) se refresquen.
+                _dbStateChanged.Raise();
 
                 return new RestoreResult(true, safetyBackup, Array.Empty<string>());
             }

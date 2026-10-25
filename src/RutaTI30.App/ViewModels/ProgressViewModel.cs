@@ -15,6 +15,7 @@ public sealed record AttemptItemVm(string WhenLocal, string Lesson, string Score
 public sealed class ProgressViewModel : ObservableObject, INavigableModule
 {
     private readonly ProgressService _progress;
+    private readonly ReviewService _reviews;
     private readonly ILessonCatalog _catalog;
     private readonly ILearningStore _learning;
     private readonly DialogService _dialogs;
@@ -25,6 +26,7 @@ public sealed class ProgressViewModel : ObservableObject, INavigableModule
     private string _studyText = string.Empty;
     private string _ticketsText = string.Empty;
     private string _reportText = string.Empty;
+    private string _reviewSummaryText = string.Empty;
     private bool _hasData;
 
     public string LessonsText { get => _lessonsText; private set => SetProperty(ref _lessonsText, value); }
@@ -32,20 +34,23 @@ public sealed class ProgressViewModel : ObservableObject, INavigableModule
     public string StudyText { get => _studyText; private set => SetProperty(ref _studyText, value); }
     public string TicketsText { get => _ticketsText; private set => SetProperty(ref _ticketsText, value); }
     public string ReportText { get => _reportText; private set => SetProperty(ref _reportText, value); }
+    public string ReviewSummaryText { get => _reviewSummaryText; private set => SetProperty(ref _reviewSummaryText, value); }
     public bool HasData { get => _hasData; private set { if (SetProperty(ref _hasData, value)) OnPropertyChanged(nameof(NoDataMessage)); } }
     public bool NoDataMessage => !HasData;
 
     public ObservableCollection<string> WeakTopics { get; } = new();
     public ObservableCollection<string> DemonstratedTopics { get; } = new();
     public ObservableCollection<AttemptItemVm> RecentAttempts { get; } = new();
+    public ObservableCollection<string> DueReviews { get; } = new();
 
     public AsyncRelayCommand GenerateReportCommand { get; }
     public AsyncRelayCommand ExportReportCommand { get; }
 
-    public ProgressViewModel(ProgressService progress, ILessonCatalog catalog, ILearningStore learning,
-        DialogService dialogs, IClock clock)
+    public ProgressViewModel(ProgressService progress, ReviewService reviews, ILessonCatalog catalog,
+        ILearningStore learning, DialogService dialogs, IClock clock)
     {
         _progress = progress;
+        _reviews = reviews;
         _catalog = catalog;
         _learning = learning;
         _dialogs = dialogs;
@@ -89,6 +94,20 @@ public sealed class ProgressViewModel : ObservableObject, INavigableModule
                     $"{a.Score:0.#} %",
                     a.Passed ? "aprobado" : "no aprobado"));
             }
+
+            // Repaso inteligente: derivado solo de intentos reales (temas fallados).
+            var due = _reviews.GetDueReviews();
+            var next = _reviews.GetScheduledReviews();
+            DueReviews.Clear();
+            foreach (var r in due.Take(12))
+                DueReviews.Add($"Día {r.Day} · {r.Topic} — {r.Reason}");
+            if (DueReviews.Count == 0)
+                DueReviews.Add("Sin repasos vencidos: presenta evaluaciones para activar el repaso de tus temas fallados.");
+            ReviewSummaryText = due.Count > 0
+                ? $"{due.Count} concepto(s) por repasar ahora · {next.Count} programados en 14 días"
+                : next.Count > 0
+                    ? $"Sin vencidos · {next.Count} concepto(s) programados en 14 días"
+                    : "Aún sin repasos programados (se activan al fallar temas en una evaluación).";
         }
         catch (Exception ex)
         {
@@ -127,6 +146,13 @@ public sealed class ProgressViewModel : ObservableObject, INavigableModule
                 sb.AppendLine("- Sin áreas detectadas aún.");
             else
                 foreach (var t in stats.WeakTopics) sb.AppendLine($"- {t}");
+            sb.AppendLine();
+            sb.AppendLine("## Repaso inteligente (intervalos crecientes sobre temas fallados)");
+            var dueReviews = _reviews.GetDueReviews();
+            if (dueReviews.Count == 0)
+                sb.AppendLine("- Sin repasos vencidos.");
+            else
+                foreach (var r in dueReviews) sb.AppendLine($"- Día {r.Day} · {r.Topic}: {r.Reason}");
             sb.AppendLine();
             sb.AppendLine("## Recomendaciones");
             sb.AppendLine("- Repasa los temas débiles antes de continuar con el siguiente bloque.");

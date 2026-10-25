@@ -72,6 +72,14 @@ public interface ILabStore
     IReadOnlyList<LabAttempt> GetAttempts(string? scenarioId = null);
 }
 
+/// <summary>Notificación de cambio de base de datos principal.
+/// Se usa para avisar a los componentes que pueden tener estado cacheado cuando la base cambia
+/// (p. ej. restaurar una copia). No reemplaza los refrescos puntuales que cada ViewModel ya lance.</summary>
+public interface IDbStateChanged
+{
+    event Action? DataChanged;
+}
+
 /// <summary>Preferencias clave/valor del usuario (JSON para estructuras).</summary>
 public interface IPreferenceStore
 {

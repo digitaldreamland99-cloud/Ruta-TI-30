@@ -37,14 +37,78 @@
         <Setter Property="Margin" Value="0,0,0,4" />
     </Style>
 
+    <!-- Tokens de forma compartidos (u8+ módulos usan el mismo radio de esquina) -->
+    <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">10</CornerRadius>
+
+    <!-- Anillo de foco visible para navegación por teclado (accesibilidad) -->
+    <Style x:Key="FocusRing">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle Margin="2" SnapsToDevicePixels="True"
+                               RadiusX="4" RadiusY="4"
+                               Stroke="{DynamicResource AccentBrush}" StrokeThickness="2"
+                               StrokeDashArray="1 2" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Tarjeta -->
     <Style x:Key="Card" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush2}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}" />
         <Setter Property="Padding" Value="18" />
         <Setter Property="Margin" Value="0,0,0,14" />
+    </Style>
+
+    <!-- Mensajes informativos (éxito / advertencia / error / info): color no es el único indicador,
+         el texto debe nombrar su condición; el borde solo acompaña.
+         Aparición discreta al volverse visible (180 ms de opacidad; si las animaciones se desactivan,
+         el estado final es idéntico y las funciones no cambian) -->
+    <Style x:Key="MsgBase" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                         From="0" To="1" Duration="0:0:0.18" />
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="MsgInfo" TargetType="Border" BasedOn="{StaticResource MsgBase}">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style x:Key="MsgSuccess" TargetType="Border" BasedOn="{StaticResource MsgBase}">
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+    <Style x:Key="MsgWarning" TargetType="Border" BasedOn="{StaticResource MsgBase}">
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBrush}" />
+    </Style>
+    <Style x:Key="MsgError" TargetType="Border" BasedOn="{StaticResource MsgBase}">
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
+    </Style>
+
+    <!-- Estado vacío (lista/sección sin contenido real) -->
+    <Style x:Key="EmptyState" TargetType="Border">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush2}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}" />
+        <Setter Property="Padding" Value="20" />
+        <Setter Property="Margin" Value="0,4,0,14" />
+    </Style>
+    <Style x:Key="EmptyStateText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
     </Style>
 
     <!-- Botones -->
@@ -56,6 +120,7 @@
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -68,11 +133,37 @@
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
+                        <!-- Hover con transición breve (150 ms, valor final idéntico al setter:
+                             las funciones y bindings no cambian si las animaciones se desactivan) -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="bd" Property="Opacity" Value="0.88" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <DoubleAnimation Storyboard.TargetName="bd"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="0.88" Duration="0:0:0.15" />
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <DoubleAnimation Storyboard.TargetName="bd"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="1" Duration="0:0:0.15" />
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
+                        <!-- Press con transición de entrada corta; la salida aplica el valor del estado
+                             activo (hover/normal) sin segunda animación sobre la misma propiedad
+                             (evita storyboards simultáneos conflictivos) -->
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="bd" Property="Opacity" Value="0.72" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <DoubleAnimation Storyboard.TargetName="bd"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="0.72" Duration="0:0:0.10" />
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="bd" Property="Opacity" Value="0.45" />
@@ -114,13 +205,22 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
-                    <Border Background="{TemplateBinding Background}"
+                    <Border x:Name="bd" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="6">
                         <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"
                                       VerticalAlignment="Center" />
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <!-- Foco visible al escribir (no cambia el valor del texto, solo el borde) -->
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="bd" Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -154,6 +254,9 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Margin" Value="0,6,0,6" />
     </Style>
+    <Style x:Key="BarSuccess" TargetType="ProgressBar" BasedOn="{StaticResource Bar}">
+        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+    </Style>
 
     <!-- Navegación lateral -->
     <Style x:Key="NavList" TargetType="ListBox">
@@ -167,8 +270,19 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
-                                <Border x:Name="bd" Background="Transparent" Padding="14,11" Margin="8,2" CornerRadius="8">
-                                    <ContentPresenter />
+                                <Border x:Name="bd" Background="Transparent" Margin="8,2" CornerRadius="8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <!-- Indicador de sección activa -->
+                                        <Rectangle x:Name="ind" Grid.Column="0" Width="3" Margin="0,5,7,5"
+                                                   Fill="{DynamicResource AccentBrush}" Visibility="Hidden" />
+                                        <Border Grid.Column="1" Padding="11,11">
+                                            <ContentPresenter />
+                                        </Border>
+                                    </Grid>
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
@@ -176,6 +290,7 @@
                                     </Trigger>
                                     <Trigger Property="IsSelected" Value="True">
                                         <Setter TargetName="bd" Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+                                        <Setter TargetName="ind" Property="Visibility" Value="Visible" />
                                         <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
@@ -200,6 +315,70 @@
         <Setter Property="CornerRadius" Value="999" />
         <Setter Property="Padding" Value="10,3" />
         <Setter Property="Margin" Value="0,0,6,0" />
+    </Style>
+
+    <!-- Variantes semánticas de insignia (borde + texto del color del estado; el texto siempre nombra su condición) -->
+    <Style x:Key="BadgeSuccess" TargetType="Border" BasedOn="{StaticResource Badge}">
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style x:Key="BadgeWarning" TargetType="Border" BasedOn="{StaticResource Badge}">
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style x:Key="BadgeDanger" TargetType="Border" BasedOn="{StaticResource Badge}">
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style x:Key="BadgeAccent" TargetType="Border" BasedOn="{StaticResource Badge}">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Texto de insignia -->
+    <Style x:Key="BadgeText" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+    <Style x:Key="BadgeTextSuccess" TargetType="TextBlock" BasedOn="{StaticResource BadgeText}">
+        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+    <Style x:Key="BadgeTextWarning" TargetType="TextBlock" BasedOn="{StaticResource BadgeText}">
+        <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+    </Style>
+    <Style x:Key="BadgeTextDanger" TargetType="TextBlock" BasedOn="{StaticResource BadgeText}">
+        <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+    </Style>
+    <Style x:Key="BadgeTextAccent" TargetType="TextBlock" BasedOn="{StaticResource BadgeText}">
+        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+    </Style>
+
+    <!-- Tooltip con la tonalidad del tema (reemplaza al nativo claro sobre fondo oscuro) -->
+    <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush2}" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Iconografía local: Segoe MDL2 Assets (incluido en Windows, sin recursos externos) -->
+    <Style x:Key="Icon" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
 </ResourceDictionary>

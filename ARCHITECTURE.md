@@ -57,6 +57,12 @@ Tests ──► Domain, Application, Infrastructure
 
 `StudyTimerService` calcula tiempos con diferencias reales de `IClock`, no con ticks de UI. La UI solo refresca la visualización cada segundo. Estado persistido en `timer_state`; sesiones en `study_sessions`.
 
+## Contenido educativo y catálogos
+
+- Catálogos embebidos en `Application/Content` (lecciones por bloques, laboratorio, casos de práctica, entrevistas, glosario, rutas): funcionan sin red y se inyectan por interfaz (`ILessonCatalog`, `IGlossaryCatalog`, listas estáticas) para poder sustituirse en pruebas.
+- El **glosario** enlaza con lecciones existentes por día (1–30) en lugar de duplicar su contenido; las **rutas posteriores al día 30** son itinerarios declarativos que referencian lecciones, prácticas (`prac-*`) y áreas de entrevistas ya existentes.
+- `ReviewService` (repaso espaciado) deriva la cola únicamente de `evaluation_attempts.details_json`; no guarda estado propio ni añade tablas.
+
 ## Seguridad
 
 - Sin ejecución de procesos del sistema operativo.

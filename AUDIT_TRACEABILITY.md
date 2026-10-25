@@ -1,5 +1,7 @@
 # AUDIT_TRACEABILITY — Ruta TI 30
 
+> **Snapshot histórico (2026-10-09)**: la matriz refleja el estado de la auditoría. Requisitos nuevos (R-24 glosario, R-25 rutas, R-26 repaso espaciado, R-27 entrevistas ampliadas) y la navegación de 9 secciones están en REQUIREMENTS.md.
+
 Matriz de trazabilidad entre requisito, implementación, pruebas y evidencia real hasta el entorno actual.
 
 ## Leyenda de estados

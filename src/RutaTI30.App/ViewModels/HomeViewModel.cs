@@ -90,6 +90,8 @@ public sealed class HomeViewModel : ObservableObject, INavigableModule
     public RelayCommand ResumeCommand { get; }
     public AsyncRelayCommand FinishCommand { get; }
     public RelayCommand ResetCommand { get; }
+    /// <summary>Accesos rápidos del panel: navega al módulo indicado por la clave de navegación.</summary>
+    public AsyncRelayCommand OpenModuleCommand { get; }
 
     public HomeViewModel(DashboardService dashboard, StudyTimerService timer, ScheduleService schedule,
         ILessonCatalog catalog, IPreferenceStore preferences, DialogService dialogs, IClock clock)
@@ -105,6 +107,13 @@ public sealed class HomeViewModel : ObservableObject, INavigableModule
         ContinueCommand = new AsyncRelayCommand(() =>
         {
             Navigate?.Invoke("learn");
+            return Task.CompletedTask;
+        });
+        // Reutiliza el mecanismo de navegación existente (MainViewModel asigna Navigate); no añade servicios.
+        OpenModuleCommand = new AsyncRelayCommand(parameter =>
+        {
+            if (parameter is string key && key.Length > 0)
+                Navigate?.Invoke(key);
             return Task.CompletedTask;
         });
         StartCommand = new AsyncRelayCommand(StartAsync);

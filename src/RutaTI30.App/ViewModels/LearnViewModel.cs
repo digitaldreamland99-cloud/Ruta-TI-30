@@ -308,12 +308,14 @@ public sealed class LearnViewModel : ObservableObject, INavigableModule
             }
 
             var answers = new Dictionary<string, int?>();
+            var correct = new Dictionary<string, bool>();
             var selected = new List<int?>();
             for (int i = 0; i < Questions.Count; i++)
             {
                 var index = Questions[i].Selected?.Index;
                 selected.Add(index);
                 answers[_currentLesson.Questions[i].Id] = index;
+                correct[_currentLesson.Questions[i].Id] = index == _currentLesson.Questions[i].CorrectIndex;
             }
 
             var unanswered = selected.Count(s => s is null);
@@ -330,7 +332,7 @@ public sealed class LearnViewModel : ObservableObject, INavigableModule
                 AttemptedUtc = _clock.UtcNow,
                 Score = result.Score,
                 Passed = result.Passed,
-                DetailsJson = AttemptDetails.Serialize(answers, result.FailedTopics)
+                DetailsJson = AttemptDetails.SerializeAttempt(answers, correct, result.FailedTopics)
             };
             _store.AddAttempt(attempt);
 

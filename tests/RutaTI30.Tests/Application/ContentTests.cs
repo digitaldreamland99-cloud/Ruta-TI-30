@@ -1,4 +1,5 @@
 using RutaTI30.Application.Content;
+using RutaTI30.Domain;
 using Xunit;
 
 namespace RutaTI30.Tests.Application;
@@ -61,5 +62,33 @@ public class ContentTests
             Assert.NotEmpty(q.EvaluationCriteria);
         }
         Assert.Equal(bank.Questions.Count, bank.Questions.Select(q => q.Id).Distinct().Count());
+    }
+
+    [Fact]
+    public void BancoDeEntrevistas_CubreLasAreasRequeridas()
+    {
+        // Áreas mínimas exigidas para la preparación de un puesto L1 (ver USER_GUIDE).
+        string[] required =
+        {
+            "Hardware", "Windows", "Redes", "Diagnóstico", "Service Desk",
+            "Escalamiento", "Seguridad y accesos", "Identidades y accesos",
+            "Atención al usuario", "Trabajo en equipo", "Priorización",
+            "Manejo de errores", "Límites técnicos", "Experiencia transferible"
+        };
+        var areas = InterviewBank.Instance.Questions.Select(q => q.Area).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var area in required)
+            Assert.Contains(area, areas);
+
+        Assert.True(InterviewBank.Instance.Questions.Count >= 30,
+            $"Se esperaban al menos 30 preguntas y hay {InterviewBank.Instance.Questions.Count}");
+    }
+
+    [Fact]
+    public void BancoDeEntrevistas_TieneLosTresTiposDePregunta()
+    {
+        var kinds = InterviewBank.Instance.Questions.Select(q => q.Kind).ToHashSet();
+        Assert.Contains(InterviewKind.Tecnica, kinds);
+        Assert.Contains(InterviewKind.Conductual, kinds);
+        Assert.Contains(InterviewKind.Diagnostico, kinds);
     }
 }

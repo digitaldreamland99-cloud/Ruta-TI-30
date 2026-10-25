@@ -9,8 +9,7 @@
             <StackPanel>
 
                 <!-- Bienvenida (sin datos todavía) -->
-                <Border Style="{StaticResource Card}" Visibility="{Binding IsWelcome, Converter={StaticResource BoolToVis}}"
-                        BorderBrush="{DynamicResource AccentBrush}">
+                <Border Style="{StaticResource MsgInfo}" Visibility="{Binding IsWelcome, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
                         <TextBlock Text="Bienvenido a Ruta TI 30" Style="{StaticResource H2}" />
                         <TextBlock Style="{StaticResource Body}" Margin="0,8,0,0"
@@ -33,9 +32,26 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding DayHeader}" Style="{StaticResource H2}" Margin="0,0,12,0" />
-                                <Border Style="{StaticResource Badge}" Background="{DynamicResource AccentBrush}">
-                                    <TextBlock Text="{Binding StateBadge}" FontSize="12" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource OnAccentBrush}" />
+                                <!-- Estado con color semántico + texto que nombra la condición (no depende del color) -->
+                                <Border Style="{StaticResource Badge}">
+                                    <TextBlock Text="{Binding StateBadge}" FontSize="12" FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource BadgeText}">
+                                                <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding StateBadge}" Value="En curso">
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding StateBadge}" Value="Completado">
+                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding StateBadge}" Value="Dominado">
+                                                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </Border>
                             </StackPanel>
                             <Button Grid.Column="1" Content="Continuar →" Style="{StaticResource BtnPrimary}"
@@ -49,6 +65,32 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Accesos rápidos a los módulos reales -->
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8A5;" Style="{StaticResource Icon}" Margin="0,0,8,0" />
+                            <TextBlock Text="Accesos rápidos" Style="{StaticResource H3}" />
+                        </StackPanel>
+                        <WrapPanel Margin="0,10,0,-8">
+                            <Button Content="Laboratorio de soporte" Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding OpenModuleCommand}" CommandParameter="lab" />
+                            <Button Content="Simulador de Help Desk" Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding OpenModuleCommand}" CommandParameter="tickets" />
+                            <Button Content="Preparación laboral" Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding OpenModuleCommand}" CommandParameter="career" />
+                            <Button Content="Mi progreso" Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding OpenModuleCommand}" CommandParameter="progress" />
+                            <Button Content="Glosario" Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding OpenModuleCommand}" CommandParameter="glossary" />
+                            <Button Content="Rutas" Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding OpenModuleCommand}" CommandParameter="routes" />
+                            <Button Content="Configuración" Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding OpenModuleCommand}" CommandParameter="settings" Margin="0,0,0,8" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
                 <!-- Estadísticas y pendientes -->
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -59,7 +101,10 @@
 
                     <Border Grid.Column="0" Style="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="Mi progreso" Style="{StaticResource H3}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE9D9;" Style="{StaticResource Icon}" Margin="0,0,8,0" />
+                                <TextBlock Text="Mi progreso" Style="{StaticResource H3}" />
+                            </StackPanel>
                             <TextBlock Text="{Binding CountsText}" Style="{StaticResource Body}" Margin="0,10,0,0" />
                             <Grid Margin="0,12,0,0">
                                 <Grid.ColumnDefinitions>
@@ -83,7 +128,10 @@
                     <StackPanel Grid.Column="2">
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
-                                <TextBlock Text="Actividades pendientes" Style="{StaticResource H3}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE73E;" Style="{StaticResource Icon}" Margin="0,0,8,0" />
+                                    <TextBlock Text="Actividades pendientes" Style="{StaticResource H3}" />
+                                </StackPanel>
                                 <ItemsControl ItemsSource="{Binding PendingActivities}" Margin="0,10,0,0">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -96,7 +144,11 @@
                         </Border>
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
-                                <TextBlock Text="Temas recomendados para repaso" Style="{StaticResource H3}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xEA80;" Style="{StaticResource Icon}" Margin="0,0,8,0" />
+                                    <TextBlock Text="Temas recomendados para repaso" Style="{StaticResource H3}" />
+                                </StackPanel>
+                                <TextBlock Text="Derivados de tu historial de evaluaciones." Style="{StaticResource Muted}" />
                                 <ItemsControl ItemsSource="{Binding ReviewTopics}" Margin="0,10,0,0">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>

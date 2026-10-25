@@ -75,6 +75,65 @@ public class TicketStoreTests : IDisposable
     }
 
     [Fact]
+    public void List_BusquedaLiteralNoTrataComodinesCmoComodines()
+    {
+        _store.AddWithHistory(NuevoTicket("INC-1", "Ana Torres", "El equipo de la sala 3 con % de núcleos."), new TicketHistoryEntry { TicketId = "INC-1", AtUtc = _ahora, Action = "Alta" });
+        _store.AddWithHistory(NuevoTicket("INC-2", "Luis Mena", "Impresora con _ y cola sin trabajos."), new TicketHistoryEntry { TicketId = "INC-2", AtUtc = _ahora, Action = "Alta" });
+
+        var porPorcentaje = _store.List(null, "%");
+        var porGuionBajo = _store.List(null, "_");
+        var porAmbos = _store.List(null, "%_");
+        var porTextoNormal = _store.List(null, "impresora");
+        var porEspacio = _store.List(null, "  ");
+
+        Assert.Empty(porPorcentaje);
+        Assert.Empty(porGuionBajo);
+        Assert.Empty(porAmbos);
+        Assert.Single(porTextoNormal);
+        Assert.Empty(porEspacio);
+    }
+
+    [Theory]
+    [InlineData("%")]
+    [InlineData("_")]
+    [InlineData("%_")]
+    [InlineData("_%")]
+    [InlineData(" % ")]
+    [InlineData("a%b_c")]
+    [InlineData("normal")]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("¡#¿?")]
+    public void List_BusquedaLiteralRespetaTextoEscritoPorElUsuario(string search)
+    {
+        _store.AddWithHistory(NuevoTicket("INC-1", "Ana Torres", "Reporte con la palabra clave."), new TicketHistoryEntry { TicketId = "INC-1", AtUtc = _ahora, Action = "Alta" });
+
+        var resultados = _store.List(null, search);
+
+        bool contieneNormal = search.Contains("clave", StringComparison.OrdinalIgnoreCase);
+
+        if (contieneNormal)
+            Assert.Single(resultados);
+        else
+            Assert.Empty(resultados);
+    }
+
+    [Fact]
+    public void List_BusquedaNormal_CoincideSoloEnTextoLiteral()
+    {
+        _store.AddWithHistory(NuevoTicket("INC-1", "Ana Torres", "El equipo de la sala 3 no enciende."), new TicketHistoryEntry { TicketId = "INC-1", AtUtc = _ahora, Action = "Alta" });
+        _store.AddWithHistory(NuevoTicket("INC-2", "Luis Mena", "Reinicio de servicios en el servidor."), new TicketHistoryEntry { TicketId = "INC-2", AtUtc = _ahora, Action = "Alta" });
+
+        var coincidencia = _store.List(null, "servicio");
+        var sinCoincidencia = _store.List(null, "impresora");
+        var mayorQue = _store.List(null, ">");
+
+        Assert.Single(coincidencia);
+        Assert.Empty(sinCoincidencia);
+        Assert.Empty(mayorQue);
+    }
+
+    [Fact]
     public void List_FiltraPorEstadoYTexto()
     {
         _store.AddWithHistory(NuevoTicket("INC-1", "Ana Torres", "El equipo de la sala 3 no enciende desde esta mañana."), new TicketHistoryEntry { TicketId = "INC-1", AtUtc = _ahora, Action = "Alta" });

@@ -2,6 +2,27 @@
 
 Formato: [Keep a Changelog] en español. Versión inicial **0.1.0 (en desarrollo)**.
 
+## [Sin publicar]
+
+### Añadido (sesión educativa, 2026-10-10)
+- **Glosario local** (`Content/Glossary.cs`, `GlossaryViewModel`, `GlossaryTemplates.xaml`): 49 términos en 5 categorías (Computación y hardware, Windows y diagnóstico, Redes, Service Desk, Seguridad e IAM) con definición sencilla, explicación técnica, ejemplo laboral, error frecuente y enlaces a lecciones existentes; búsqueda insensible a mayúsculas y acentos, filtro por categoría y navegación sin conexión.
+- **Rutas posteriores al día 30** (`Content/SpecializationRoutes.cs`, `RoutesViewModel`, `RoutesTemplates.xaml`): 5 itinerarios opcionales (Service Desk L1, soporte de aplicaciones, infraestructura y redes, Windows y Microsoft 365, IAM) con prerrequisitos, competencias, lecciones base (días 1–30), prácticas asociadas (ids `prac-*`) y áreas del banco de entrevistas; declarados como opcionales, no como requisito de un primer empleo L1.
+- **Simulador de Help Desk ampliado**: 9 → **16 casos de práctica** (añadidos VPN, correo que no sincroniza, fallo tras actualización, solicitud de permisos, incidente multiusuario, contraseña no válida en aplicación y equipo que no enciende), con las mismas secciones didácticas y datos ficticios identificados. *(Restaurado y de nuevo en el árbol el 2026-10-11; ver PROGRESS.md).*
+- **Banco de entrevistas ampliado**: 21 → **34 preguntas en 17 áreas**, con competencia evaluada, respuesta modelo, explicación, errores frecuentes y seguimientos. *(Restaurado y de nuevo en el árbol el 2026-10-11).*
+- **Glosario ampliado 49 → 59 términos** (2026-10-11): phishing, malware, ransomware, copia de seguridad, antivirus/EDR, actualizaciones, Windows Update y recuperación, CMD y PowerShell, CV orientado a soporte y laboratorio doméstico; auditoría de glosario integrada en `scripts/verify/edu-content-audit.py`.
+- **Repaso espaciado** (`Services/ReviewService.cs`, sección en Mi progreso): cola de repaso derivada solo de intentos reales; conceptos fallados con intervalos crecientes (1, 2, 4, 8, 14 días), alargados con aciertos consecutivos; visible en la interfaz de Progreso.
+- **Pruebas nuevas**: `GlossaryTests.cs`, `SpecializationRouteTests.cs`, `ReviewServiceTests.cs`; `PracticeScenarioTests` y `ContentTests` ampliadas a 16 escenarios y 34 preguntas.
+- **Verificadores estáticos**: `scripts/verify/static-regression.py` (XML, balance léxico, resolución de bindings, sin red, SQL parametrizado) y `scripts/verify/edu-content-audit.py` (conteos reales de contenido e ids únicos); ambos aprobados.
+- Navegación lateral: 7 → **9 secciones** (Glosario y Rutas integradas en la navegación existente).
+
+- **Corrección de inicio (P0)**: registro faltante de `IGlossaryCatalog` en el contenedor DI de `App.xaml.cs`; sin esta línea el módulo «Glosario» no se activaba en tiempo de ejecución por falta de dependencia inyectable.
+
+### Corregido (2026-10-11, segunda sesión)
+- **P0 de compilación**: referencia a `NullDbStateChanged.Instance` sin clase definida en `Infrastructure/BackupService.cs` (residuo del conflicto stash/árbol). Creada la implementación nula de `IDbStateChanged`.
+- **P1 — vistas desactualizadas tras restaurar (F-05)**: la notificación de cambio de base de datos existía en DI pero ningún suscriptor la escuchaba. Ahora `BackupService.Restore()` levanta el evento solo si la restauración fue exitosa, y `MainViewModel` refresca los módulos con datos cargados al recibirla.
+- **Contenido**: dos términos del glosario (Windows Update y recuperación; CMD y PowerShell) tenían la categoría «Windows» en vez de «Windows y diagnóstico»; corregido y ahora detectado automáticamente por la auditoría.
+- **Auditoría**: `edu-content-audit.py` ahora valida categorías del glosario y detecta cuasi-duplicados por definición inicial idéntica.
+
 ## [0.1.0] — 2026-10-09
 
 ### Añadido
@@ -24,7 +45,7 @@ Formato: [Keep a Changelog] en español. Versión inicial **0.1.0 (en desarrollo
 - Scripts de Windows: `build.ps1`, `test.ps1`, `publish.ps1`.
 - Documentación: README, REQUIREMENTS, ARCHITECTURE, ROADMAP, PROGRESS, DECISIONS, TESTING, VERIFY (procedimiento de validación en Windows), USER_GUIDE, INSTALLATION, BACKUP_RESTORE.
 
-### Limitaciones conocidas (versión 0.1.0)
-- Compilación, pruebas y ejecución **no verificadas**: el entorno de desarrollo no dispone del SDK .NET. Ver TESTING.md.
+### Limitaciones conocidas (versión 0.1.0 y ampliación sin publicar)
+- Compilación, pruebas y ejecución **no verificadas**: el entorno de desarrollo no dispone del SDK .NET. Ver TESTING.md y VERIFY.md.
 - Instalador: configuración lista (Inno Setup 6), pero **sin compilar ni probar** en Windows; requiere Inno Setup 6 y una VM de verificación.
-- El banco de entrevistas cubre 21 preguntas en 12 áreas; puede ampliarse según necesidad.
+- La ampliación de esta sesión (glosario, rutas, 16 escenarios, 34 preguntas, repaso espaciado) está **implementada y verificada estáticamente**, pendiente de compilación y suite en Windows. El banco de entrevistas cubre 34 preguntas en 17 áreas; puede ampliarse según necesidad.

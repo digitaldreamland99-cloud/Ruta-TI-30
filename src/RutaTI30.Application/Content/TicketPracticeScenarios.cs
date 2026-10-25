@@ -19,7 +19,7 @@ public sealed record TicketPracticeScenario(
     string ResolutionOrEscalation,
     string DocumentationNote);
 
-/// <summary>Banco de casos de práctica: 8 situaciones típicas de L1 con datos ficticios.</summary>
+/// <summary>Banco de casos de práctica: 16 situaciones típicas de L1 con datos ficticios.</summary>
 public static class TicketPracticeScenarios
 {
     public static readonly IReadOnlyList<TicketPracticeScenario> All = new List<TicketPracticeScenario>
@@ -193,6 +193,139 @@ public static class TicketPracticeScenarios
                 "Si no obtiene dirección, escala a red indicando segmento, comparación y prueba de renovación."
             },
             "Resolución en L1 si la renovación restaura la dirección (cliente o sesión DHCP puntual). Escala a infraestructura si el servidor/rango DHCP no responde en el segmento: ahí el cambio de configuración de red excede el puesto L1.",
-            "Documenta la dirección antes/después, el alcance (solo él vs. segmento) y el resultado de la renovación; eso identifica el servidor o el rango con el que falla.")
+            "Documenta la dirección antes/después, el alcance (solo él vs. segmento) y el resultado de la renovación; eso identifica el servidor o el rango con el que falla."),
+
+        new("prac-10", "No conecta desde casa con la VPN", "Mariana Cruz", "Finanzas",
+            TicketCategory.Redes, ImpactLevel.Medio, UrgencyLevel.Alta,
+            "Mariana trabaja desde casa y el cliente de VPN se queda en «conectando» y luego muestra un error de autenticación. Desde la oficina todo funciona y ayer conectó sin problema desde la misma casa.",
+            new[]
+            {
+                "¿Desde cuándo falla exactamente y qué cambió justo antes (contraseña nueva, actualización del cliente, MFA)?",
+                "¿Le pasa solo a ella o a las demás personas en remoto?",
+                "¿Qué mensaje o código de error muestra el cliente, y puede autenticarse en otros servicios (correo, portal) con la misma cuenta?"
+            },
+            new[]
+            {
+                "Verifica la identidad del reportero y que el acceso remoto esté autorizado antes de operar.",
+                "Anota el mensaje exacto del cliente, la versión y la hora del fallo; prueba el portal web de acceso con las credenciales.",
+                "Si el cambio reciente fue de contraseña o MFA, reinicia la sesión del cliente y confirma el segundo factor.",
+                "Si el túnel falla con autenticación correcta o hay más reportes en remoto, escala a red con cliente, versión, mensaje y alcance."
+            },
+            "Resolución en L1: reautenticación del cliente tras cambio reciente de contraseña o MFA. Escala a red cuando la autenticación correcta no logra levantar el túnel o cuando el fallo es de varios usuarios en remoto.",
+            "Registra dispositivo, versión del cliente, mensaje exacto, hora, si el alcance es individual o colectivo y la acción aplicada."),
+
+        new("prac-11", "El correo no sincroniza en la computadora", "Diego Herrera", "Comercial",
+            TicketCategory.Aplicacion, ImpactLevel.Medio, UrgencyLevel.Media,
+            "Diego dice que «el correo dejó de recibir» en su computadora: ve la bandeja de entrada de ayer, pero por el portal web sí llega todo. Necesita responder cotizaciones pendientes.",
+            new[]
+            {
+                "¿El portal web muestra los correos nuevos? (aislar cliente vs. servicio)",
+                "¿En qué aplicación y sistema ocurre, y desde cuándo? ¿Cambió su contraseña recientemente?",
+                "¿Solo a él le pasa o hay más reportes del área?"
+            },
+            new[]
+            {
+                "Confirma primero con el portal web si el servicio recibe correo: si llega, el problema es del cliente.",
+                "Revisa el estado de sincronización, el mensaje de error y las credenciales guardadas del cliente.",
+                "Cierra y vuelve a conectar la cuenta (o reconecta el buzón) con credenciales actualizadas; verifica la recepción de un correo nuevo con el usuario.",
+                "Si también falla el portal web o hay varios reportes, escala al equipo de mensajería con alcance y hora de inicio."
+            },
+            "Resolución en L1: reconexión del cliente con credenciales actualizadas y verificación con el usuario. Escala a mensajería si el servicio web también falla o si el fallo afecta a varias personas.",
+            "Registra el cliente, el sistema, el síntoma exacto, la prueba del portal y la verificación final de recepción."),
+
+        new("prac-12", "La aplicación de recursos humanos falló tras la actualización", "Paola Rivas", "Recursos Humanos",
+            TicketCategory.Aplicacion, ImpactLevel.Medio, UrgencyLevel.Alta,
+            "Anoche se aplicó una actualización programada a la aplicación de vacaciones. Esta mañana varios usuarios del área ven una pantalla en blanco al iniciar sesión y ya hay tres reportes.",
+            new[]
+            {
+                "¿Qué mensaje o comportamiento exacto se observa y en qué paso ocurre?",
+                "¿A todos los del área les pasa o solo a algunos? ¿Qué equipos o perfiles están involucrados?",
+                "¿Qué cambió exactamente: versión anterior y actual, y la hora de la ventana de mantenimiento?"
+            },
+            new[]
+            {
+                "Registra versión previa y actual, mensaje exacto y pasos para reproducir el fallo.",
+                "Comprueba el alcance con al menos dos equipos o usuarios del área y confirma la ventana de cambio en el registro de mantenimiento.",
+                "Prueba un acceso con otro usuario en el mismo equipo para separar perfil vs. aplicación.",
+                "Escala al dueño de la aplicación con alcance, versiones, hora de inicio de la falla y evidencia; evita cambios improvisados en producción."
+            },
+            "Fuera del alcance de L1 resolver: la corrección pertenece al equipo dueño de la aplicación. L1 documenta, acota el alcance, evita duplicados y da seguimiento hasta la confirmación.",
+            "Registra alcance (usuarios/equipos), versiones, ventana de cambio, mensaje, hora de inicio y hora de escalamiento."),
+
+        new("prac-13", "Solicitud de acceso a la carpeta de proyectos", "Ricardo Solís", "Proyectos",
+            TicketCategory.Acceso, ImpactLevel.Bajo, UrgencyLevel.Baja,
+            "El jefe de Proyectos solicita dar acceso de lectura a la carpeta «Proyectos 2026» a una colaboradora que se incorpora el lunes. Es una solicitud, no una falla: nadie perdió acceso.",
+            new[]
+            {
+                "¿Quién es el dueño del recurso y queda registrado quién autoriza el acceso?",
+                "¿Qué nivel necesita realmente: lectura basta o necesita escribir? ¿Ya pertenece a un grupo que tenga ese acceso?",
+                "¿El acceso debe expirar o revisarse en una fecha?"
+            },
+            new[]
+            {
+                "Confirma la solicitud por escrito y la autorización del dueño de la carpeta antes de modificar permisos.",
+                "Verifica si existe un grupo con ese acceso: agrupa en lugar de conceder permisos individuales.",
+                "Aplica el mínimo privilegio (lectura si basta) y registra alcance, autorización y fecha de revisión.",
+                "Confirma la asignación con el solicitante y deja el ticket cerrado con la evidencia."
+            },
+            "Proceso de solicitud: se aprueba con autorización del dueño y permiso mínimo, preferentemente vía grupo. Se rechaza o escala si falta autorización o si se pide acceso total sin justificación.",
+            "Documenta qué acceso, para quién, quién autoriza, por qué ese nivel, grupo utilizado y fecha de revisión."),
+
+        new("prac-14", "El correo corporativo está caído para todo el personal", "Varios reporteros", "Recepción / General",
+            TicketCategory.Servicio, ImpactLevel.Alto, UrgencyLevel.Alta,
+            "Desde hace unos 20 minutos llegan reportes de distintas áreas: nadie puede enviar ni recibir correo. El portal web también muestra error de servicio no disponible. Ya son cinco reportes.",
+            new[]
+            {
+                "¿Cuál es el alcance real: un área, un edificio o toda la organización? ¿Al menos dos reportes independientes lo confirman?",
+                "¿A qué hora se observó por primera vez y quién lo reportó primero?",
+                "¿Existe ya una incidencia abierta o una comunicación oficial para no duplicar esfuerzos?"
+            },
+            new[]
+            {
+                "Confirma el alcance con dos o tres reportes independientes y una prueba del portal web.",
+                "Revisa el tablero de estado interno y el canal de incidencias conocidas para evitar duplicados.",
+                "Abre un ticket maestro, vincula los reportes relacionados y comunica a los usuarios: causa en investigación y próxima actualización.",
+                "Escala de inmediato a infraestructura/mensajería con alcance, hora de inicio y número de usuarios afectados."
+            },
+            "Caso de alta prioridad: la restauración está fuera del alcance de L1 y se escala de inmediato. El papel de L1 es acotar el alcance, evitar duplicados, coordinar la comunicación y dar seguimiento.",
+            "Registra hora del primer reporte, alcance confirmado, número de usuarios, ticket maestro, comunicación enviada y hora del escalamiento."),
+
+        new("prac-15", "La contraseña nueva no funciona en una aplicación", "Verónica Luna", "Contabilidad",
+            TicketCategory.Acceso, ImpactLevel.Medio, UrgencyLevel.Alta,
+            "Verónica cambió su contraseña hace dos horas. Entra sin problema al equipo de escritorio y al portal de correo, pero la aplicación de nómina sigue pidiéndole la contraseña anterior y ya va por varios intentos.",
+            new[]
+            {
+                "¿En qué servicios sí funciona la contraseña nueva y en cuáles no?",
+                "¿Desde cuándo ocurre exactamente y qué aplicación tenía abierta o con sesión guardada al momento del cambio?",
+                "¿La cuenta está bloqueada por los intentos repetidos?"
+            },
+            new[]
+            {
+                "Verifica la identidad del reportero antes de operar con la cuenta.",
+                "Comprueba el estado de la cuenta y la autenticación en el portal con la contraseña nueva (solo lectura).",
+                "Revisa y actualiza o elimina las credenciales guardadas en el equipo para esa aplicación y pide cerrar sesión por completo.",
+                "Valida el acceso real con la usuaria; si la aplicación sigue exigiendo la contraseña anterior, escala al dueño de la aplicación como posible fallo de integración."
+            },
+            "Resolución en L1: limpieza de credenciales guardadas y reautenticación. Escala si la aplicación no respeta el cambio de contraseña o si los intentos generaron bloqueos repetidos.",
+            "Registra servicios probados (con qué contraseña funcionó cada uno), credenciales eliminadas, intentos realizados y resultado final."),
+
+        new("prac-16", "La computadora de recepción ya no enciende", "Gabriela Mora", "Recepción",
+            TicketCategory.Hardware, ImpactLevel.Alto, UrgencyLevel.Media,
+            "La PC de recepción no enciende: no prende ningún LED y no se escucha el ventilador. Ayer funcionaba y hoy por la mañana los visitantes no pueden registrarse. No se observa que otros equipos del lugar fallen.",
+            new[]
+            {
+                "¿Qué señales da exactamente: LED, ventilador, pitidos o nada? ¿El monitor muestra señal?",
+                "¿Hubo un corte eléctrico, tormenta o mantenimiento en la zona? ¿La regleta o el interruptor están encendidos?",
+                "¿A otro equipo del mismo lugar le pasa o solo a esta PC?"
+            },
+            new[]
+            {
+                "Verifica la energía de forma segura y externa: enchufe, regleta e interruptor; prueba otro enchufe que se sepa bueno.",
+                "Observa las señales (LED, ventilador, pitidos) para clasificar: sin energía vs. enciende sin imagen; revisa que el monitor tenga señal.",
+                "Prueba el monitor o el cable en otro equipo para descartar periféricos sin abrir el equipo ni tocar su interior.",
+                "Si no hay respuesta con energía confirmada, escala a soporte de hardware con las señales clasificadas y las pruebas externas realizadas."
+            },
+            "Resolución en L1: solo pruebas externas seguras (energía, periféricos, señales). El diagnóstico de componentes internos escala a soporte de hardware; L1 no abre equipos ni manipula el interior.",
+            "Registra señales observadas, pruebas externas realizadas, hora, impacto en el área y a quién se escaló."),
     };
 }

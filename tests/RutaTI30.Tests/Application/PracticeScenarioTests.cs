@@ -7,10 +7,10 @@ namespace RutaTI30.Tests.Application;
 public class PracticeScenarioTests
 {
     [Fact]
-    public void Casos_NueveEscenariosConIdsUnicos()
+    public void Casos_DieciseisEscenariosConIdsUnicos()
     {
         var all = TicketPracticeScenarios.All;
-        Assert.Equal(9, all.Count);
+        Assert.Equal(16, all.Count);
         Assert.Equal(all.Count, all.Select(c => c.Id).Distinct().Count());
     }
 
@@ -50,6 +50,30 @@ public class PracticeScenarioTests
             c.Description.Contains("169.254", StringComparison.Ordinal));
         Assert.Contains(TicketPracticeScenarios.All, c => c.Id == "prac-05" &&
             c.SuggestedSteps.Any(s => s.Contains("ipconfig", StringComparison.OrdinalIgnoreCase)));
+    }
+
+    [Fact]
+    public void Casos_NuevosCubrenLosTemasPendientes()
+    {
+        // VPN (prac-10), correo sin sincronizar (prac-11), fallo tras actualización (prac-12),
+        // solicitud de permisos (prac-13), incidente multiusuario (prac-14), contraseña (prac-15)
+        // y hardware sin energía (prac-16).
+        foreach (var id in new[] { "prac-10", "prac-11", "prac-12", "prac-13", "prac-14", "prac-15", "prac-16" })
+            Assert.Contains(TicketPracticeScenarios.All, c => c.Id == id);
+
+        // El caso de servicio debe exigir escalamiento inmediato y comunicar a los usuarios.
+        var outage = TicketPracticeScenarios.All.Single(c => c.Id == "prac-14");
+        Assert.Equal(TicketCategory.Servicio, outage.Category);
+        Assert.True(outage.ResolutionOrEscalation.Contains("escala", StringComparison.OrdinalIgnoreCase));
+
+        // La solicitud de permisos debe exigir autorización del dueño del recurso.
+        var request = TicketPracticeScenarios.All.Single(c => c.Id == "prac-13");
+        Assert.Contains(request.SuggestedSteps, s => s.Contains("autoriz", StringComparison.OrdinalIgnoreCase));
+
+        // Ningún escenario puede invitar a abrir equipos ni a ejecutar acciones privilegiadas.
+        foreach (var c in TicketPracticeScenarios.All)
+            foreach (var step in c.SuggestedSteps)
+                Assert.DoesNotContain("abrir el equipo y", step, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

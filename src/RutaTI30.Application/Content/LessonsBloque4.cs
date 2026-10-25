@@ -152,7 +152,7 @@ public static class LessonsBloque4
             "Describir el ciclo de vida completo de una cuenta (alta→baja) y diferenciar autenticación/autorización/MFA, con 80 % correctas.",
             1, 60,
             new[] { "Día 4: usuarios y permisos" },
-            "IAM (Gestión de Identidades y Accesos) administra quién es cada persona en el sistema y qué puede hacer. Su ciclo de vida: alta (crear con permisos mínimos), cambio (rol, área), baja (retirar TODO al salir) y revisión periódica. " +
+            "IAM (Gestión de Identidades y Accesos) administra quién es cada persona en el sistema y qué puede hacer. Su ciclo de vida: alta (crear con permisos mínimos), cambio (rol, área), baja (retirar todo al salir) y revisión periódica. " +
             "El fallo más caro no es la contraseña olvidada: es la cuenta que quedó activa de alguien que se fue. Soporte participa en altas, bloqueos, restablecimientos y en reportar accesos sospechosos.",
 
             new[]

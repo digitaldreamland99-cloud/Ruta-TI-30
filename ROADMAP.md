@@ -20,6 +20,9 @@ Estados: `Pendiente` · `En desarrollo` · `Implementado sin verificar` · `Veri
 | 10 | Calidad (pruebas ejecutadas) | Bloqueado | `dotnet test` pendiente de entorno con SDK |
 | 11 | Publicación Windows x64 + scripts | Implementado sin verificar | Scripts listos; instalador configurado (Inno Setup 6, per-user); ambos pendientes de ejecutar en Windows |
 | 12 | Revisión final de documentación | Implementado sin verificar | 11 documentos creados y ajustados al estado real del código |
+| 13 | Ampliación educativa: glosario, rutas posteriores, escenarios y entrevistas | Implementado sin verificar | Glosario 49 términos; 5 rutas; 16 escenarios; 34 preguntas; pruebas nuevas |
+| 14 | Repaso espaciado basado en intentos reales | Implementado sin verificar | `ReviewService` + sección visible en Mi progreso |
+| 15 | Verificación estática reproducible | Verificado | `static-regression.py` y `edu-content-audit.py` aprobados en Linux |
 
 ## Estado por fase (resumen honesto)
 
@@ -31,8 +34,7 @@ Estados: `Pendiente` · `En desarrollo` · `Implementado sin verificar` · `Veri
 ## Próximas tareas concretas
 
 1. Ejecutar `scripts/build.ps1` en Windows con .NET 10 SDK → corregir errores de compilación si aparecen.
-2. Ejecutar `scripts/test.ps1` → aprobar pruebas de dominio, persistencia y temporizador.
-3. Ejecutar la aplicación, verificar navegación, persistencia tras reinicio, temporizador y copia de seguridad.
+2. Ejecutar `scripts/test.ps1` → aprobar la suite (18 archivos, incluye `GlossaryTests`, `SpecializationRouteTests` y `ReviewServiceTests`).
+3. Ejecutar la aplicación, verificar navegación de 9 secciones, persistencia tras reinicio, temporizador, repaso espaciado, glosario y rutas.
 4. Generar publicación `dotnet publish -r win-x64` (script `publish.ps1`) y verificar el artefacto real.
 5. Instalar Inno Setup 6, ejecutar `scripts/build-installer.ps1` y probar instalación/desinstalación en una VM limpia (conservación de datos incluida).
-6. Ampliar el banco de preguntas de entrevista más allá de las 14 iniciales (mejora de contenido, no bloqueo).

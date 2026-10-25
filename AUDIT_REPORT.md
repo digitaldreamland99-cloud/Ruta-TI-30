@@ -1,5 +1,7 @@
 # AUDIT_REPORT — Ruta TI 30
 
+> **Snapshot histórico (2026-10-09)**: este informe refleja el estado del repositorio al momento de la auditoría. Desde entonces se añadieron el glosario (49 términos), las 5 rutas posteriores al día 30, los escenarios 10–16, las preguntas q22–q34 y el repaso espaciado; la navegación pasó de 7 a 9 secciones. El estado actual está en PROGRESS.md y CHANGELOG.md.
+
 Informe de auditoría integral realizado sobre el repositorio real en el entorno actual. No se simularon Windows, .NET, WPF ni SQLite; las conclusiones que requieren ejecución se etiquetan explícitamente como tales.
 
 ## 1. Resumen ejecutivo

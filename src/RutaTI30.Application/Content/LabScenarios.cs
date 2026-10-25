@@ -26,7 +26,7 @@ public static class LabScenarios
             Id = "lab-01",
             Title = "Equipo sin conexión",
             Difficulty = 1,
-            Context = "Sala contabilidad: 3 equipos pierden internet desde hace 20 min; entre sí sí se comunican. Ayer se cambió un switch por uno prestado.",
+            Context = "Sala contabilidad: 3 equipos pierden internet desde hace 20 min; sí se comunican entre sí. Ayer se cambió un switch por uno prestado.",
             Symptoms = new[]
             {
                 "Navegación falla en los 3 equipos",

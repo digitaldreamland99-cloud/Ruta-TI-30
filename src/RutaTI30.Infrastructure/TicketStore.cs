@@ -106,7 +106,7 @@ VALUES (@ticket_id, @at, @action, @note, @from_state, @to_state);";
         if (stateFilter is not null)
             clauses.Add("state = @state");
         if (!string.IsNullOrWhiteSpace(search))
-            clauses.Add("(id LIKE @search OR reporter LIKE @search OR description LIKE @search OR department LIKE @search)");
+            clauses.Add("(" + TextFilterClause("id", "@search") + " OR " + TextFilterClause("reporter", "@search") + " OR " + TextFilterClause("description", "@search") + " OR " + TextFilterClause("department", "@search") + ")");
 
         cmd.CommandText = SelectTicketsSql +
             (clauses.Count > 0 ? " WHERE " + string.Join(" AND ", clauses) : "") +
@@ -115,12 +115,35 @@ VALUES (@ticket_id, @at, @action, @note, @from_state, @to_state);";
         if (stateFilter is not null)
             cmd.Parameters.AddWithValue("@state", (int)stateFilter.Value);
         if (!string.IsNullOrWhiteSpace(search))
-            cmd.Parameters.AddWithValue("@search", $"%{search.Trim()}%");
+            cmd.Parameters.AddWithValue("@search", EscapeLikeLiteral(search.Trim()));
 
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
             result.Add(Read(reader));
         return result;
+    }
+
+    private static string TextFilterClause(string column) => $"{column} LIKE @search";
+
+    /// <summary>
+    /// Hace que LIKE compare el texto literalmente: escapa %, _ y el carácter de escape.
+    /// Por defecto la búsqueda de tickets es textual, no de patrón (no hay función de búsqueda avanzada).
+    /// </summary>
+    private static string EscapeLikeLiteral(string raw)
+    {
+        if (string.IsNullOrEmpty(raw))
+            return "";
+
+        var sb = new System.Text.StringBuilder(raw.Length + 4);
+        foreach (var c in raw)
+        {
+            sb.Append(c switch
+            {
+                '%' or '_' or '\\' => "\\" + c,
+                _ => c
+            });
+        }
+        return $"%{sb}%";
     }
 
     public IReadOnlyList<TicketHistoryEntry> GetHistory(string ticketId)
